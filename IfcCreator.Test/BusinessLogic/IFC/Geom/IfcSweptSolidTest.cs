@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -26,11 +27,11 @@ namespace IfcCreator.Ifc.Geom
 
             //Create shape representation
             // -- extruded profile shape
-            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new IfcCartesianPoint[] {new IfcCartesianPoint(-0.5, -0.5),
-                                                                                     new IfcCartesianPoint(-0.5, 0.5),
-                                                                                     new IfcCartesianPoint(0.5, 0.5),
-                                                                                     new IfcCartesianPoint(0.5, -0.5),
-                                                                                     new IfcCartesianPoint(-0.5, -0.5)});
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-0.5, -0.5},
+                                                                                   new double[] {-0.5, 0.5},
+                                                                                   new double[] {0.5, 0.5},
+                                                                                   new double[] {0.5, -0.5},
+                                                                                   new double[] {-0.5, -0.5}});
             IfcProfileDef profileDef = new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
                                                                         null,
                                                                         outerCurve);

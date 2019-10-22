@@ -8,14 +8,25 @@ namespace IfcCreator.Ifc.Geom
 #nullable enable
     public static class IfcGeom
     {
-        public static IfcPolyline CreatePolyLine(IfcCartesianPoint[] outerCurve)
+        public static IfcPolyline CreatePolyLine(IEnumerable<double[]> curve)
         {
-            List<IfcCartesianPoint> outerPointList = new List<IfcCartesianPoint>();
-            foreach(IfcCartesianPoint point in outerCurve)
+            List<IfcCartesianPoint> pointList = new List<IfcCartesianPoint>();
+            foreach(double[] point in curve)
             {
-                outerPointList.Add(point);
+                if (point.Length == 2)
+                {
+                    pointList.Add(new IfcCartesianPoint(point[0], point[1]));
+                }
+                if (point.Length == 3)
+                {
+                    pointList.Add(new IfcCartesianPoint(point[0], point[1], point[2]));
+                }
+                if ((point.Length < 2) || (point.Length > 3))
+                {
+                    throw new ArgumentException(string.Format("Cartesion point definition has invalid dimension {0}", point.Length));
+                }
             }
-            return new IfcPolyline(outerPointList.ToArray());
+            return new IfcPolyline(pointList.ToArray());
         }
 
     }

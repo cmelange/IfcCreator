@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -55,11 +56,11 @@ namespace IfcCreator.Ifc.Geom
                                                           new IfcPositiveLengthMeasure(1),
                                                           new IfcPositiveLengthMeasure(1));
             IfcRepresentationItem interRepresentation = inter_first.Intersection(inter_second);
-            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new IfcCartesianPoint[] {new IfcCartesianPoint(6, 0),
-                                                                                     new IfcCartesianPoint(6, 1),
-                                                                                     new IfcCartesianPoint(7, 1),
-                                                                                     new IfcCartesianPoint(7, 0),
-                                                                                     new IfcCartesianPoint(6, 0)});
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {6, 0},
+                                                                                     new double[] {6, 1},
+                                                                                     new double[] {7, 1},
+                                                                                     new double[] {7, 0},
+                                                                                     new double[] {6, 0}});
             IfcProfileDef profileDef = new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
                                                                         null,
                                                                         outerCurve);
@@ -76,7 +77,7 @@ namespace IfcCreator.Ifc.Geom
                                            new IfcLabel("BooleanResult"),
                                            new IfcRepresentationItem[] {unionRepresentation, diffRepresentation, interRepresentation, cutRepresentation});
             IfcProxy product = IfcInit.CreateProxy(null, null, null, storey.ObjectPlacement, null);
-            product.Representation = new IfcProductDefinitionShape(null, null, new IfcRepresentation[] {shapeRepresentation});;
+            product.Representation = new IfcProductDefinitionShape(null, null, new IfcRepresentation[] {shapeRepresentation});
             storey.Contains(product, null);
             
             //Write to IFC file
