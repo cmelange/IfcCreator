@@ -32,8 +32,10 @@ namespace IfcCreator.Ifc.Geom
                     PolygonShape(operandStack);
                     break;
                 case OperationName.EXTRUDE:
+                    Extrude(operandStack);
                     break;
                 case OperationName.REVOLVE:
+                    Revolve(operandStack);
                     break;
                 case OperationName.TRANSLATION:
                     break;
@@ -138,6 +140,34 @@ namespace IfcCreator.Ifc.Geom
             } catch (Exception e) 
             {
                 throw new ArgumentException(string.Format("Invalid operand for POLYGON_SHAPE: {0}", operand), e);
+            }
+        }
+
+        private static void Extrude(Stack operandStack)
+        {
+            try
+            {
+                double extrudeHeight = Double.Parse((string) operandStack.Pop());
+                IfcProfileDef extrudeProfile = (IfcProfileDef) operandStack.Pop();
+                operandStack.Push(extrudeProfile.Extrude(extrudeHeight));
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operands for EXTRUDE", e);
+            }
+        }
+
+        private static void Revolve(Stack operandStack)
+        {
+            try
+            {
+                double revolveAngle = Double.Parse((string) operandStack.Pop());
+                IfcProfileDef revolveProfile = (IfcProfileDef) operandStack.Pop();
+                operandStack.Push(revolveProfile.Revolve(revolveAngle));
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operands for REVOLVE", e);
             }
         }
     }

@@ -38,7 +38,7 @@ namespace IfcCreator.Ifc.Geom
                         break;
                 }
             }
-
+            
             if (operandStack.Count != 1)
             {   // operand stack should contain the result
                 throw new ArgumentException(string.Format("Could not parse geometric representation expression: {0}", expression));
