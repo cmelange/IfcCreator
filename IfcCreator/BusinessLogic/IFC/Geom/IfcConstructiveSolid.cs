@@ -3,7 +3,6 @@ using System;
 using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcMeasureResource;
 using BuildingSmart.IFC.IfcGeometryResource;
-using BuildingSmart.IFC.IfcProfileResource;
 
 namespace IfcCreator.Ifc.Geom
 {

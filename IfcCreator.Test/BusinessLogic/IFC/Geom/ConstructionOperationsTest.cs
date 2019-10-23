@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using BuildingSmart.IFC.IfcProfileResource;
 using BuildingSmart.IFC.IfcGeometryResource;
 using BuildingSmart.IFC.IfcGeometricModelResource;
+using BuildingSmart.IFC.IfcMeasureResource;
 
 using Xunit;
 
@@ -113,6 +114,75 @@ namespace IfcCreator.Ifc.Geom
             var response = operandStack.Pop();
             Assert.IsType<IfcRevolvedAreaSolid>(response);
             Assert.Equal(70.77, ((IfcRevolvedAreaSolid) response).Angle.Value);
+        }
+
+        [Fact]
+        public void UnionTest()
+        {
+            var operandStack = new Stack();
+            IfcCsgPrimitive3D first = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0,0,0), null, null),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1));
+            IfcCsgPrimitive3D second = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0.5,0.5,0.5), null, null),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1));
+            operandStack.Push(first);
+            operandStack.Push(second);
+            ConstructionOperations.ExecuteOperation(OperationName.UNION, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcBooleanResult>(response);
+            Assert.Equal(IfcBooleanOperator.UNION, ((IfcBooleanResult) response).Operator);
+            Assert.Equal(0, ((IfcBlock)((IfcBooleanResult) response).FirstOperand).Position.Location.Coordinates[0].Value);
+            Assert.Equal(0.5, ((IfcBlock)((IfcBooleanResult) response).SecondOperand).Position.Location.Coordinates[0].Value);
+        }
+
+        [Fact]
+        public void DifferenceTest()
+        {
+            var operandStack = new Stack();
+            IfcCsgPrimitive3D first = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0,0,0), null, null),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1));
+            IfcCsgPrimitive3D second = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0.5,0.5,0.5), null, null),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1));
+            operandStack.Push(first);
+            operandStack.Push(second);
+            ConstructionOperations.ExecuteOperation(OperationName.DIFFERENCE, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcBooleanResult>(response);
+            Assert.Equal(IfcBooleanOperator.DIFFERENCE, ((IfcBooleanResult) response).Operator);
+            Assert.Equal(0, ((IfcBlock)((IfcBooleanResult) response).FirstOperand).Position.Location.Coordinates[0].Value);
+            Assert.Equal(0.5, ((IfcBlock)((IfcBooleanResult) response).SecondOperand).Position.Location.Coordinates[0].Value);
+        }
+
+        [Fact]
+        public void IntersectionTest()
+        {
+            var operandStack = new Stack();
+            IfcCsgPrimitive3D first = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0,0,0), null, null),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1),
+                                                   new IfcPositiveLengthMeasure(1));
+            IfcCsgPrimitive3D second = new IfcBlock(new IfcAxis2Placement3D(new IfcCartesianPoint(0.5,0.5,0.5), null, null),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1),
+                                                    new IfcPositiveLengthMeasure(1));
+            operandStack.Push(first);
+            operandStack.Push(second);
+            ConstructionOperations.ExecuteOperation(OperationName.INTERSECTION, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcBooleanResult>(response);
+            Assert.Equal(IfcBooleanOperator.INTERSECTION, ((IfcBooleanResult) response).Operator);
+            Assert.Equal(0, ((IfcBlock)((IfcBooleanResult) response).FirstOperand).Position.Location.Coordinates[0].Value);
+            Assert.Equal(0.5, ((IfcBlock)((IfcBooleanResult) response).SecondOperand).Position.Location.Coordinates[0].Value);
         }
     }
 }

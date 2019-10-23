@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcGeometryResource;
 using BuildingSmart.IFC.IfcProfileResource;
 
@@ -18,7 +19,9 @@ namespace IfcCreator.Ifc.Geom
         ROTATION,
         UNION,
         DIFFERENCE,
-        INTERSECTION
+        INTERSECTION,
+        PLANE,
+        CUT_BY_PLANE
     }
 
     public static class ConstructionOperations
@@ -42,10 +45,17 @@ namespace IfcCreator.Ifc.Geom
                 case OperationName.ROTATION:
                     break;
                 case OperationName.UNION:
+                    Union(operandStack);
                     break;
                 case OperationName.DIFFERENCE:
+                    Difference(operandStack);
                     break;
                 case OperationName.INTERSECTION:
+                    Intersection(operandStack);
+                    break;
+                case OperationName.PLANE:
+                    break;
+                case OperationName.CUT_BY_PLANE:
                     break;
                 default:
                     break;
@@ -168,6 +178,48 @@ namespace IfcCreator.Ifc.Geom
             catch (Exception e)
             {
                 throw new ArgumentException("Invalid operands for REVOLVE", e);
+            }
+        }
+
+        private static void Union(Stack operandStack)
+        {
+            try
+            {
+                var secondOperand = (IfcBooleanOperand) operandStack.Pop();
+                var firstOperand = (IfcBooleanOperand) operandStack.Pop();
+                operandStack.Push(firstOperand.Union(secondOperand));
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operands for UNION", e);
+            }
+        }
+
+        private static void Difference(Stack operandStack)
+        {
+            try
+            {
+                var secondOperand = (IfcBooleanOperand) operandStack.Pop();
+                var firstOperand = (IfcBooleanOperand) operandStack.Pop();
+                operandStack.Push(firstOperand.Difference(secondOperand));
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operands for DIFFERENCE", e);
+            }
+        }
+
+        private static void Intersection(Stack operandStack)
+        {
+            try
+            {
+                var secondOperand = (IfcBooleanOperand) operandStack.Pop();
+                var firstOperand = (IfcBooleanOperand) operandStack.Pop();
+                operandStack.Push(firstOperand.Intersection(secondOperand));
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operands for INTERSECTION", e);
             }
         }
     }
