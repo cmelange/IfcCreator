@@ -41,8 +41,10 @@ namespace IfcCreator.Ifc.Geom
                     Revolve(operandStack);
                     break;
                 case OperationName.TRANSLATION:
+                    Translate(operandStack);
                     break;
                 case OperationName.ROTATION:
+                    Rotate(operandStack);
                     break;
                 case OperationName.UNION:
                     Union(operandStack);
@@ -64,16 +66,16 @@ namespace IfcCreator.Ifc.Geom
 
         private static void PolygonShape(Stack operandStack)
         {
-            string operand = (string) operandStack.Pop();
-            //remove all spaces
-            operand.Replace(" ", "");
-            if ((operand.Length < 19) || !operand.StartsWith("[[[") || !operand.EndsWith("]]]"))
-            {   //operand should represent a three dimensional array
-                throw new ArgumentException(string.Format("Invalid operand for POLYGON_SHAPE: {0}", operand));
-            }
-
             try
             {
+                string operand = (string) operandStack.Pop();
+                //remove all spaces
+                operand.Replace(" ", "");
+                if ((operand.Length < 19) || !operand.StartsWith("[[[") || !operand.EndsWith("]]]"))
+                {   //operand should represent a three dimensional array
+                    throw new ArgumentException(string.Format("Invalid operand for POLYGON_SHAPE: {0}", operand));
+                }
+            
                 // Parse operand
                 int openParenthesis = 2;
                 List<List<double[]>> paths = new List<List<double[]>>();
@@ -149,7 +151,7 @@ namespace IfcCreator.Ifc.Geom
 
             } catch (Exception e) 
             {
-                throw new ArgumentException(string.Format("Invalid operand for POLYGON_SHAPE: {0}", operand), e);
+                throw new ArgumentException("Invalid operand for POLYGON_SHAPE", e);
             }
         }
 
@@ -220,6 +222,85 @@ namespace IfcCreator.Ifc.Geom
             catch (Exception e)
             {
                 throw new ArgumentException("Invalid operands for INTERSECTION", e);
+            }
+        }
+
+        private static double[] ParseVector(string vector)
+        {
+            //remove all spaces
+            vector.Replace(" ", "");
+            if ((vector.Length < 7) || !vector.StartsWith("[") || !vector.EndsWith("]"))
+            {   //operand should represent a one dimensional array
+                throw new ArgumentException("Could not parse vector");
+            }
+            StringBuilder stringBuffer = new StringBuilder();
+            List<double> result = new List<double>(); 
+            for (int i=1; i < vector.Length; ++i)
+            {
+                switch (vector[i])
+                {
+                    case ']':
+                        // closing translation vector
+                        result.Add(Double.Parse(stringBuffer.ToString()));
+                        break;
+                    case ',':
+                        // starting new coordinate in vector
+                        result.Add(Double.Parse(stringBuffer.ToString()));
+                        stringBuffer.Clear();
+                        break;
+                    default:
+                        stringBuffer.Append(vector[i]);
+                        break;
+                }
+            }
+            if (result.Count != 3)
+            {
+                throw new ArgumentException("Vector should have exactely 3 coordinates");
+            }
+            return result.ToArray();
+        }
+        
+        private static void Translate(Stack operandStack)
+        {
+            try
+            {
+
+                var operand = (string) operandStack.Pop();
+                double[] translationVector = ParseVector(operand);
+
+                var item = operandStack.Pop();
+                if (item is IfcSweptAreaSolid)
+                {
+                    operandStack.Push(((IfcSweptAreaSolid) item).Translate(translationVector.ToArray()));
+                    return;
+                }
+                throw new ArgumentException("Invalid type for TRANSLATION");
+            } 
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operand for TRANSLATION", e);
+            }
+        }
+
+        private static void Rotate(Stack operandStack)
+        {
+            try
+            {
+
+                var operand = (string) operandStack.Pop();
+                double[] rotation = ParseVector(operand);
+
+                var item = operandStack.Pop();
+                if (item is IfcSweptAreaSolid)
+                {
+                    operandStack.Push(((IfcSweptAreaSolid) item).Rotate(rotation.ToArray()));
+                    return;
+                }
+                throw new ArgumentException("Invalid type for ROTATION");
+            } 
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid type for ROTATION", e);
             }
         }
     }

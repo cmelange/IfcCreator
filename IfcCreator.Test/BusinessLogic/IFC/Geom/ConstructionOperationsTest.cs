@@ -184,5 +184,53 @@ namespace IfcCreator.Ifc.Geom
             Assert.Equal(0, ((IfcBlock)((IfcBooleanResult) response).FirstOperand).Position.Location.Coordinates[0].Value);
             Assert.Equal(0.5, ((IfcBlock)((IfcBooleanResult) response).SecondOperand).Position.Location.Coordinates[0].Value);
         }
+
+        [Fact]
+        public void TranslationTest()
+        {
+            // ==== Translate IfcSweptAreaSolid
+            var operandStack = new Stack();
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-1, -1},
+                                                                                   new double[] {-1, 1},
+                                                                                   new double[] {1, 1},
+                                                                                   new double[] {1, -1},
+                                                                                   new double[] {-1, -1}});
+            IfcProfileDef profileDef = new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
+                                                                        null,
+                                                                        outerCurve);
+            operandStack.Push(profileDef.Extrude(1));
+            operandStack.Push("[1,2,3]");
+            ConstructionOperations.ExecuteOperation(OperationName.TRANSLATION, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsAssignableFrom<IfcSweptAreaSolid>(response);
+            Assert.Equal(1, ((IfcSweptAreaSolid) response).Position.Location.Coordinates[0].Value);
+            Assert.Equal(2, ((IfcSweptAreaSolid) response).Position.Location.Coordinates[1].Value);
+            Assert.Equal(3, ((IfcSweptAreaSolid) response).Position.Location.Coordinates[2].Value);
+        }
+
+        [Fact]
+        public void RotationTest()
+        {
+            var operandStack = new Stack();
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-1, -1},
+                                                                                   new double[] {-1, 1},
+                                                                                   new double[] {1, 1},
+                                                                                   new double[] {1, -1},
+                                                                                   new double[] {-1, -1}});
+            IfcProfileDef profileDef = new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
+                                                                        null,
+                                                                        outerCurve);
+            operandStack.Push(profileDef.Extrude(1));
+            operandStack.Push("[90,90,90]");
+            ConstructionOperations.ExecuteOperation(OperationName.ROTATION, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsAssignableFrom<IfcSweptAreaSolid>(response);
+            Assert.Equal(0, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[0].Value, 10);
+            Assert.Equal(0, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[1].Value, 10);
+            Assert.Equal(1, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[2].Value, 10);
+        }        
+
     }
 }
