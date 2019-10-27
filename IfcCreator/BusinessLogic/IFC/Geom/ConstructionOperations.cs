@@ -274,6 +274,11 @@ namespace IfcCreator.Ifc.Geom
                     operandStack.Push(((IfcSweptAreaSolid) item).Translate(translationVector.ToArray()));
                     return;
                 }
+                if (item is IfcBooleanResult)
+                {
+                    operandStack.Push(((IfcBooleanResult) item).Translate(translationVector.ToArray()));
+                    return;
+                }
                 throw new ArgumentException("Invalid type for TRANSLATION");
             } 
             catch (Exception e)
@@ -296,6 +301,12 @@ namespace IfcCreator.Ifc.Geom
                     operandStack.Push(((IfcSweptAreaSolid) item).Rotate(rotation.ToArray()));
                     return;
                 }
+                if (item is IfcBooleanResult)
+                {
+                    operandStack.Push(((IfcBooleanResult) item).Rotate(rotation.ToArray()));
+                    return;
+                }
+
                 throw new ArgumentException("Invalid type for ROTATION");
             } 
             catch (Exception e)
