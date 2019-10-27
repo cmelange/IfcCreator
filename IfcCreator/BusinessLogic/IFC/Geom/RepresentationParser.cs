@@ -21,12 +21,17 @@ namespace IfcCreator.Ifc.Geom
                 {
                     case '(':
                         // parenthesis are opened after operation
-                        operationStack.Push((OperationName) Enum.Parse(typeof(OperationName), stringBuffer.ToString()));
+                        operationStack.Push((OperationName) Enum.Parse(typeof(OperationName),
+                                                                       stringBuffer.ToString()));
                         stringBuffer.Clear();
                         break;
                     case ')':
                         // parenthesis are closed after operand
-                        operandStack.Push(stringBuffer.ToString());
+                        if (stringBuffer.Length > 0)
+                        {   //needed only in case of literal operand. The result of nested operations
+                            //is pushed on the stack by the ExecuteOperation function
+                            operandStack.Push(stringBuffer.ToString());
+                        }
                         stringBuffer.Clear();
                         ConstructionOperations.ExecuteOperation(operationStack.Pop(), operandStack);
                         break;
@@ -38,7 +43,7 @@ namespace IfcCreator.Ifc.Geom
                         break;
                 }
             }
-            
+
             if (operandStack.Count != 1)
             {   // operand stack should contain the result
                 throw new ArgumentException(string.Format("Could not parse geometric representation expression: {0}", expression));

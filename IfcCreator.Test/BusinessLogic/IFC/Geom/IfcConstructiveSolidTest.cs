@@ -65,8 +65,9 @@ namespace IfcCreator.Ifc.Geom
                                                                         null,
                                                                         outerCurve);
             IfcSweptAreaSolid cut_reference = profileDef.Extrude(1);
-            IfcRepresentationItem cutRepresentation = cut_reference.ClipByPlane(new double[] {6.5, 0.5, 0},
-                                                                                new double[] {1,1,0});
+            IfcPlane plane = IfcGeom.CreatePlane(new double[] {6.5, 0.5, 0},
+                                                 new double[] {1,1,0});
+            IfcRepresentationItem cutRepresentation = cut_reference.ClipByPlane(plane);
 
             //Create product with representation and place in storey
             var contextEnum = project.RepresentationContexts.GetEnumerator();

@@ -56,8 +56,10 @@ namespace IfcCreator.Ifc.Geom
                     Intersection(operandStack);
                     break;
                 case OperationName.PLANE:
+                    Plane(operandStack);
                     break;
                 case OperationName.CUT_BY_PLANE:
+                    CutByPlane(operandStack);
                     break;
                 default:
                     break;
@@ -291,7 +293,6 @@ namespace IfcCreator.Ifc.Geom
         {
             try
             {
-
                 var operand = (string) operandStack.Pop();
                 double[] rotation = ParseVector(operand);
 
@@ -311,8 +312,64 @@ namespace IfcCreator.Ifc.Geom
             } 
             catch (Exception e)
             {
-                throw new ArgumentException("Invalid type for ROTATION", e);
+                throw new ArgumentException("Invalid operand for ROTATION", e);
             }
         }
+
+        private static void Plane(Stack operandStack)
+        {
+            try
+            {
+                var operand = (string) operandStack.Pop();
+                //remove all spaces
+                operand.Replace(" ", "");
+                int splitPos = operand.IndexOf("],") + 1;
+                //plane equation is n[0]*x + n[1]*y + n[2]*z = d
+                double[] normal = ParseVector(operand.Substring(0,splitPos));
+                double d = Double.Parse(operand.Substring(splitPos + 1, operand.Length - splitPos - 1));
+                //find point on plane
+                double[] point = new double[] {0,0,0};
+                for (int i =0; i<3; ++i)
+                {
+                    if (Math.Abs(normal[i]) > 0)
+                    {
+                        point[i] = d/normal[i];
+                        break;
+                    }
+                }                
+                IfcPlane plane = IfcGeom.CreatePlane(point, normal);
+                operandStack.Push(plane);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operand for PLANE", e);
+            }
+        }
+
+        private static void CutByPlane(Stack operandStack)
+        {
+            try
+            {
+                IfcPlane planeOperand = (IfcPlane) operandStack.Pop();
+                var objectOperand = operandStack.Pop();
+                if (objectOperand is IfcSweptAreaSolid)
+                {
+                    operandStack.Push(((IfcSweptAreaSolid) objectOperand).ClipByPlane(planeOperand));
+                    return;
+                }
+                if (objectOperand is IfcBooleanClippingResult)
+                {
+                    operandStack.Push(((IfcBooleanClippingResult) objectOperand).ClipByPlane(planeOperand));
+                    return;
+                }
+
+                throw new ArgumentException("Invalid type for CUT_BY_PLANE");
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Invalid operand for CUT_BY_PLANE", e);
+            }
+        }
+
     }
 }

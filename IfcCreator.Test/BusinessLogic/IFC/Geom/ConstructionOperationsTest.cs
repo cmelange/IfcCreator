@@ -279,5 +279,57 @@ namespace IfcCreator.Ifc.Geom
             Assert.Equal(1, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).SecondOperand).Position.RefDirection.DirectionRatios[2].Value, 10);
         }        
 
+        [Fact]
+        public void PlaneTest()
+        {
+            var operandStack = new Stack();
+            operandStack.Push("[0,0,2],-2");
+            ConstructionOperations.ExecuteOperation(OperationName.PLANE, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsAssignableFrom<IfcPlane>(response);
+            Assert.Equal(0, ((IfcPlane) response).Position.Axis.DirectionRatios[0].Value);
+            Assert.Equal(0, ((IfcPlane) response).Position.Axis.DirectionRatios[1].Value);
+            Assert.Equal(2, ((IfcPlane) response).Position.Axis.DirectionRatios[2].Value);
+            Assert.Equal(0, ((IfcPlane) response).Position.Location.Coordinates[0].Value);
+            Assert.Equal(0, ((IfcPlane) response).Position.Location.Coordinates[1].Value);
+            Assert.Equal(-1, ((IfcPlane) response).Position.Location.Coordinates[2].Value);
+        }
+
+        [Fact]
+        public void CutByPlaneTest()
+        {
+            // === Cut IfcSweptAreaSolid
+            var operandStack = new Stack();
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {6, 0},
+                                                                                   new double[] {6, 1},
+                                                                                   new double[] {7, 1},
+                                                                                   new double[] {7, 0},
+                                                                                   new double[] {6, 0}});
+            IfcProfileDef profileDef = new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
+                                                                        null,
+                                                                        outerCurve);
+            operandStack.Push(profileDef.Extrude(1));
+            operandStack.Push(IfcGeom.CreatePlane(new double[] {6.5, 0.5, 0},
+                                                  new double[] {1,1,0}));
+            ConstructionOperations.ExecuteOperation(OperationName.CUT_BY_PLANE, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsAssignableFrom<IfcBooleanClippingResult>(response);
+            Assert.IsType<IfcExtrudedAreaSolid>(((IfcBooleanClippingResult) response).FirstOperand);
+            Assert.IsType<IfcPlane>(((IfcHalfSpaceSolid) ((IfcBooleanClippingResult) response).SecondOperand).BaseSurface);
+
+            // === Cut IfcSweptAreaSolid
+            operandStack.Push(response);
+            operandStack.Push(IfcGeom.CreatePlane(new double[] {6.5, 0.5, 0},
+                                                  new double[] {1,1,0}));
+            ConstructionOperations.ExecuteOperation(OperationName.CUT_BY_PLANE, operandStack);
+            Assert.Single(operandStack);
+            response = operandStack.Pop();
+            Assert.IsAssignableFrom<IfcBooleanClippingResult>(response);
+            Assert.IsType<IfcBooleanClippingResult>(((IfcBooleanClippingResult) response).FirstOperand);
+            Assert.IsType<IfcPlane>(((IfcHalfSpaceSolid) ((IfcBooleanClippingResult) response).SecondOperand).BaseSurface);
+        }
+
     }
 }

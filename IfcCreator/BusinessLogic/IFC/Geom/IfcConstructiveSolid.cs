@@ -1,8 +1,8 @@
-using System;
-
 using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcMeasureResource;
 using BuildingSmart.IFC.IfcGeometryResource;
+
+using IfcCreator.Ifc.Geom;
 
 namespace IfcCreator.Ifc.Geom
 {
@@ -25,24 +25,24 @@ namespace IfcCreator.Ifc.Geom
         }
 
         public static IfcBooleanClippingResult ClipByPlane(this IfcSweptAreaSolid first,
-                                                           double[] point,
-                                                           double[] normal)
+                                                           IfcPlane plane)
         {
-            //find a ref direction perpendicular to the plane normal
-            //dot product xn*xr + yn*yr + zn*zr = 0
-            double xr = normal[0] + 1;
-            double yr = normal[1] - 1;
-            double zr = -1 * (normal[0]*xr + normal[1]*yr) / normal[2];
-            IfcAxis2Placement3D planeDef = new IfcAxis2Placement3D(new IfcCartesianPoint(point[0],
-                                                                                         point[1],
-                                                                                         point[2]),
-                                                                   new IfcDirection(normal[0],
-                                                                                    normal[1],
-                                                                                    normal[2]),
-                                                                   new IfcDirection(xr, yr, zr));
+            return ClipByPlaneBase(first, plane);
+        }
+
+        public static IfcBooleanClippingResult ClipByPlane(this IfcBooleanClippingResult first,
+                                                           IfcPlane plane)
+        {
+            return ClipByPlaneBase(first, plane);
+        }
+
+        private static IfcBooleanClippingResult ClipByPlaneBase(this IfcBooleanOperand first,
+                                                                IfcPlane plane)
+        {
+            
             return new IfcBooleanClippingResult(IfcBooleanOperator.DIFFERENCE,
                                                 first,
-                                                new IfcHalfSpaceSolid(new IfcPlane(planeDef),
+                                                new IfcHalfSpaceSolid(plane,
                                                                       new IfcBoolean(false)));
         }
 

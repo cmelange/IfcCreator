@@ -29,5 +29,22 @@ namespace IfcCreator.Ifc.Geom
             return new IfcPolyline(pointList.ToArray());
         }
 
+        public static IfcPlane CreatePlane(double[] point,
+                                           double[] normal)
+        {
+            //find a ref direction perpendicular to the plane normal
+            //dot product xn*xr + yn*yr + zn*zr = 0
+            double xr = normal[0] + 1;
+            double yr = normal[1] - 1;
+            double zr = -1 * (normal[0]*xr + normal[1]*yr) / normal[2];
+            return new IfcPlane(new IfcAxis2Placement3D(new IfcCartesianPoint(point[0],
+                                                                              point[1],
+                                                                              point[2]),
+                                                        new IfcDirection(normal[0],
+                                                                         normal[1],
+                                                                         normal[2]),
+                                                        new IfcDirection(xr, yr, zr)));
+        }
+
     }
 }
