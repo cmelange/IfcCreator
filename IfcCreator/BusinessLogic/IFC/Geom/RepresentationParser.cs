@@ -8,7 +8,7 @@ using BuildingSmart.IFC.IfcGeometryResource;
 namespace IfcCreator.Ifc.Geom
 {
 
-    static class RepresentationParser
+    public static class RepresentationParser
     {
         public static IfcRepresentationItem ParseConstructionString(string expression)
         {
@@ -37,6 +37,19 @@ namespace IfcCreator.Ifc.Geom
                         break;
                     case ' ':
                         // Remove spaces
+                        break;
+                    case '\n':
+                        // Remove newlines
+                        break;
+                    case '\t':
+                        //remove tabs
+                        break;
+                    case '.':
+                        // nor an operation, nor an operand starts with a dot
+                        if (stringBuffer.Length > 0)
+                        {
+                            stringBuffer.Append(expression[i]);
+                        }
                         break;
                     default:
                         stringBuffer.Append(expression[i]);
