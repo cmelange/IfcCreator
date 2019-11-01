@@ -18,7 +18,7 @@ namespace IfcCreator.Ifc
                                      IfcObjectDefinition[] relatedObjects,
                                      IfcOwnerHistory? ownerHistory)
         {
-            IfcOwnerHistory history = ownerHistory ?? IfcInit.CreateOwnerHistory(null, null);
+            IfcOwnerHistory history = ownerHistory ?? IfcInit.CreateOwnerHistory(null, null, null);
             IfcRelAggregates relation = new IfcRelAggregates(IfcInit.CreateGloballyUniqueId(),
                                                              history,
                                                              null,  //__Name
@@ -43,7 +43,7 @@ namespace IfcCreator.Ifc
                                     IfcProduct[] relatedObjects,
                                     IfcOwnerHistory? ownerHistory)
         {
-            IfcOwnerHistory history = ownerHistory ?? IfcInit.CreateOwnerHistory(null, null);
+            IfcOwnerHistory history = ownerHistory ?? IfcInit.CreateOwnerHistory(null, null, null);
             IfcRelContainedInSpatialStructure relation = 
                     new IfcRelContainedInSpatialStructure(IfcInit.CreateGloballyUniqueId(),
                                                           history,

@@ -58,7 +58,7 @@ namespace IfcCreator.Ifc.Geom
             //Write to IFC file
             using (FileStream fs = File.Create("./swept_geom_test.ifc"))
             {
-               project.SerializeToStep(fs, IFC_SCHEMA.IFC2X3, null);
+               project.SerializeToStep(fs, "IFC2X3", null);
             }
         }
     }

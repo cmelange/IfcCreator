@@ -25,13 +25,15 @@ namespace IfcCreator.Ifc
             building_default.Aggregate(storey_default, null);
             using (FileStream fs = File.Create("./default_project.ifc"))
             {
-               project_default.SerializeToStep(fs, IFC_SCHEMA.IFC2X3, null);
+               project_default.SerializeToStep(fs, "IFC2X3", null);
             }
 
             //==== MANUAL CONTENT PROJECT ====
-            IfcOrganization organization = IfcInit.CreateOrganization("test organization", "a dummy organization for testing");
+            IfcPerson person = IfcInit.CreatePerson("Melange", "Cedric");
+            IfcOrganization organization = IfcInit.CreateOrganization("test organization", "a dummy organization for testing", "MyOrg");
             IfcApplication application = IfcInit.CreateApplication(organization, "1.0", "test app", "TestApp");
-            IfcOwnerHistory ownerHistory = IfcInit.CreateOwnerHistory(organization,
+            IfcOwnerHistory ownerHistory = IfcInit.CreateOwnerHistory(person,
+                                                                      organization,
                                                                       application);
             IfcProject project_manual = IfcInit.CreateProject("manual",
                                                               "My manual test project",
@@ -44,7 +46,7 @@ namespace IfcCreator.Ifc
             building_manual.Aggregate(storey_manual, null);
             using (FileStream fs = File.Create("./manual_project.ifc"))
             {
-               project_manual.SerializeToStep(fs, IFC_SCHEMA.IFC2X3, "my company");
+               project_manual.SerializeToStep(fs, "IFC2X3", "my company");
             }
         }
     }

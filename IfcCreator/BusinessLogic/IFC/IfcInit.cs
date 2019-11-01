@@ -21,24 +21,32 @@ namespace IfcCreator.Ifc
         {
             return new IfcAxis2Placement3D(new IfcCartesianPoint(0,0,0), null, null);
         }
-        public static IfcOwnerHistory CreateOwnerHistory(IfcOrganization? organization,
+
+        public static IfcPerson CreatePerson(string givenName = "",
+                                             string familyName = "",
+                                             string identifier = "")
+        {
+            return new IfcPerson(new IfcIdentifier(identifier),  //__Identification
+                                 new IfcLabel(familyName),       //__FamilyName
+                                 new IfcLabel(givenName),        //__GivenName
+                                 new IfcLabel[0],                //__MidleNames
+                                 new IfcLabel[0],                //__PrefixTitles
+                                 new IfcLabel[0],                //__SuffixTitles
+                                 new IfcActorRole[0],            //__Roles
+                                 new IfcAddress[0]);             //__Addresses
+        }
+        public static IfcOwnerHistory CreateOwnerHistory(IfcPerson? person,
+                                                         IfcOrganization? organization,
                                                          IfcApplication? application)
         {
-            IfcPerson user = new IfcPerson(null,                //__Identification
-                                           null,                //__FamilyName
-                                           null,                //__GivenName
-                                           new IfcLabel[0],     //__MidleNames
-                                           new IfcLabel[0],     //__PrefixTitles
-                                           new IfcLabel[0],     //__SuffixTitles
-                                           new IfcActorRole[0], //__Roles
-                                           new IfcAddress[0]);  //__Addresses
-            IfcOrganization owningOrganization = organization ?? CreateOrganization("", "");
+            IfcPerson user = person ?? CreatePerson("","");
+            IfcOrganization owningOrganization = organization ?? CreateOrganization("", "", "");
             IfcPersonAndOrganization owningPersonAndOrganization = 
                 new IfcPersonAndOrganization(user, owningOrganization, new IfcActorRole[0]);
             IfcApplication owningApplication = application ??
-                CreateApplication(CreateOrganization("ECL", ""),
+                CreateApplication(CreateOrganization("ECLife", "", "ECL"),
                                   "",
-                                  "IfcCreator library by ECL",
+                                  "IfcCreator service by ECLife",
                                   "IfcCreator");
             double timestamp = 
                 (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0,DateTimeKind.Utc)).TotalSeconds;
@@ -53,9 +61,10 @@ namespace IfcCreator.Ifc
         }
 
         public static IfcOrganization CreateOrganization(String? name,
-                                                         String? description)
+                                                         String? description,
+                                                         String? identifier)
         {
-            return new IfcOrganization(null,                    //__Identification  
+            return new IfcOrganization(new IfcIdentifier(identifier),  
                                        new IfcLabel(name),
                                        new IfcText(description), //__Description
                                        new IfcActorRole[0],      //__Roles
@@ -82,7 +91,7 @@ namespace IfcCreator.Ifc
             IfcGloballyUniqueId gid = CreateGloballyUniqueId();
             IfcGeometricRepresentationContext representationContext =
                 new IfcGeometricRepresentationContext(null,  //__ContextIdentifier
-                                                      null,  //__ContectType  
+                                                      new IfcLabel("Model"),  //__ContextType  
                                                       new IfcDimensionCount(3),
                                                       new IfcReal(1e-5),
                                                       CreateIfcAxis2Placement3D(),
@@ -113,7 +122,7 @@ namespace IfcCreator.Ifc
                                                      angleSIUnit,
                                                      angleConversionUnit} );
             return new IfcProject(gid,
-                                  ownerHistory ?? CreateOwnerHistory(null, null),
+                                  ownerHistory ?? CreateOwnerHistory(null, null, null),
                                   new IfcLabel(name),
                                   new IfcText(description),
                                   null,    //__ObjectType
@@ -128,7 +137,7 @@ namespace IfcCreator.Ifc
                                          IfcOwnerHistory? ownerHistory)
         {
             return new IfcSite(CreateGloballyUniqueId(),
-                               ownerHistory ?? CreateOwnerHistory(null, null),
+                               ownerHistory ?? CreateOwnerHistory(null, null, null),
                                new IfcLabel(name),
                                new IfcText(description),
                                null,    //__ObjectType
@@ -151,7 +160,7 @@ namespace IfcCreator.Ifc
                                                  IfcObjectPlacement? relObjectPlacement)
         {
             return new IfcBuilding(CreateGloballyUniqueId(),
-                                   ownerHistory ?? CreateOwnerHistory(null, null),
+                                   ownerHistory ?? CreateOwnerHistory(null, null, null),
                                    new IfcLabel(name),
                                    new IfcText(description),
                                    null,    //__ObjectType,
@@ -172,7 +181,7 @@ namespace IfcCreator.Ifc
                                                              IfcObjectPlacement? relObjectPlacement)
         {
             return new IfcBuildingStorey(CreateGloballyUniqueId(),
-                                         ownerHistory ?? CreateOwnerHistory(null, null),
+                                         ownerHistory ?? CreateOwnerHistory(null, null, null),
                                          new IfcLabel(name),
                                          new IfcText(description),
                                          null,    //__ObjectType
@@ -196,7 +205,7 @@ namespace IfcCreator.Ifc
                 new IfcLocalPlacement(relObjectPlacement,
                                       relativePlacement ?? CreateIfcAxis2Placement3D());
             return new IfcProxy(CreateGloballyUniqueId(),
-                                ownerHistory ?? CreateOwnerHistory(null, null),
+                                ownerHistory ?? CreateOwnerHistory(null, null, null),
                                 new IfcLabel(name),
                                 new IfcText(description),
                                 null,    //__ObjectType

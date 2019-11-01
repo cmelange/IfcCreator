@@ -7,22 +7,18 @@ using BuildingSmart.Serialization.Step;
 
 namespace IfcCreator.Ifc
 {
-    public enum IFC_SCHEMA {
-        IFC2X3,
-        IFC4,
-        IFC4X1
-    }
+
 #nullable enable
     public static class IfcProjectSerializerExtension
     {
         public static void SerializeToStep(this IfcProject project,
                                            Stream outputStream,
-                                           IFC_SCHEMA schema,
+                                           String schema,
                                            String? application)
         {
             Serializer serializer = new StepSerializer(typeof(IfcProject),
                                                        null,
-                                                       schema.ToString(),
+                                                       schema,
                                                        null,
                                                        application ?? "ECL IfcCreator");
             serializer.WriteObject(outputStream, project);
