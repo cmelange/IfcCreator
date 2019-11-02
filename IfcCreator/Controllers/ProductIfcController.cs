@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using IfcCreator.Interface;
 using IfcCreator.Interface.DTO;
+using IfcCreator.HTTP;
 
 namespace IfcCreator.Controllers
 {
@@ -13,10 +14,13 @@ namespace IfcCreator.Controllers
     public class ProductIfcController : ControllerBase
     {
         private readonly IProductIfcCreator _ifcCreator;
+        private readonly IResponseHelper _responseHelper;
 
-        public ProductIfcController(IProductIfcCreator ifcCreator)
+        public ProductIfcController(IProductIfcCreator ifcCreator,
+                                    IResponseHelper responseHelper)
         {
             this._ifcCreator = ifcCreator;
+            this._responseHelper = responseHelper;
         }
 
         // POST api/create-ifc/product/{productName}
@@ -24,7 +28,15 @@ namespace IfcCreator.Controllers
         public async Task<IActionResult> Post(string name, [FromBody] ProductIfcRequest request)
         {
             MemoryStream memStream = new MemoryStream();
-            this._ifcCreator.CreateProductIfc(request, memStream);
+            await this._responseHelper.PostCommand((ProductIfcRequest request) => 
+                                                   {
+                                                       return Task.Run(() => 
+                                                       {
+                                                           this._ifcCreator.CreateProductIfc(request, memStream);
+                                                       });
+                                                   },
+                                                   request,
+                                                   HttpContext);
             return File(memStream, "application/octet-stream", String.Format("{0}.ifc", name));
         }
 

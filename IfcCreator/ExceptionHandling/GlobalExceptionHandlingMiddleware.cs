@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace IfcCreator.ExceptionHandling
             catch (Exception ex)
             {
                 _logger.LogError($"unexpected server error: {ex}");
-                await HandleExceptionAsync(httpContext, new ReportableException());
+                await HandleExceptionAsync(httpContext, new ReportableException("an unexpected exception has occurred", ex));
             }
         }
     
@@ -40,10 +41,22 @@ namespace IfcCreator.ExceptionHandling
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = exception.status;
 
+            LogRequest(context);
             string exceptionJSON = exception.ToJSON();
-            _logger.LogTrace("{status} - {content}", context.Response.StatusCode, exceptionJSON);
+            _logger.LogError("{status} - {content}", context.Response.StatusCode, exceptionJSON);
+            _logger.LogDebug(exception, "an exception was catched");
 
             return context.Response.WriteAsync(exceptionJSON);
+        }
+
+        private void LogRequest(HttpContext httpContext)
+        {
+                httpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                StreamReader reader = new StreamReader( httpContext.Request.Body );
+                string body = reader.ReadToEnd();
+                _logger.LogInformation("{method} {path} {content}", httpContext.Request.Method,
+                                                                    httpContext.Request.Path,
+                                                                    body );
         }
         
     }

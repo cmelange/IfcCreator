@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 
 using IfcCreator.Interface;
 using IfcCreator.ExceptionHandling;
+using IfcCreator.HTTP;
 
 namespace IfcCreator
 {
@@ -34,6 +35,7 @@ namespace IfcCreator
                     options.InvalidModelStateResponseFactory = ctx => new ValidationErrorActionResult();
                 });
             services.AddSingleton<IProductIfcCreator, ProductIfcCreator>();
+            services.AddSingleton<IResponseHelper, ResponseHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
