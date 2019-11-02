@@ -2,9 +2,9 @@ namespace IfcCreator.Interface.DTO
 {
     public class OwnerHistory
     {
-        public Person person {get; private set; }
-        public Organization organization {get; private set; }
-        public Application application {get; private set; }
+        public Person person {get; set; }
+        public Organization organization {get; set; }
+        public Application application {get; set; }
 
         private OwnerHistory()
         {

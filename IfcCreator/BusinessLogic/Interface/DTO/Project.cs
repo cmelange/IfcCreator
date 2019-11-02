@@ -2,8 +2,8 @@ namespace IfcCreator.Interface.DTO
 {
     public class Project
     {
-        public string name {get; private set; }
-        public string description {get; private set; }
+        public string name {get; set; }
+        public string description {get; set; }
 
         private Project() {
             this.name = "";

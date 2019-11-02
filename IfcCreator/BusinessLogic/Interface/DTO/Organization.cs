@@ -2,9 +2,9 @@ namespace IfcCreator.Interface.DTO
 {
     public class Organization
     {
-        public string name {get; private set; }
-        public string description {get; private set; }
-        public string identifier {get; private set; }
+        public string name {get; set; }
+        public string description {get; set; }
+        public string identifier {get; set; }
 
         private Organization() {
             this.name = "";

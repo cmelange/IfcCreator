@@ -8,17 +8,17 @@ namespace IfcCreator.Interface.DTO
     }
     public class Product
     {
-        public ProductType type {get; protected set; }
-        public string name {get; protected set; }
-        public string description {get; protected set; }
-        public List<Representation> represenations {get; protected set; }
+        public ProductType type {get; set; }
+        public string name {get; set; }
+        public string description {get; set; }
+        public List<Representation> representations {get; set; }
 
         private Product()
         {
             this.type = ProductType.PROXY;
             this.name = "";
             this.description = "";
-            this.represenations = new List<Representation>();
+            this.representations = new List<Representation>();
         }
 
         public class Builder: AbstractProductBuilder<Product>
@@ -57,7 +57,7 @@ namespace IfcCreator.Interface.DTO
 
             public AbstractProductBuilder<T> addRepresenation(Representation representation)
             {
-                this.product.represenations.Add(representation);
+                this.product.representations.Add(representation);
                 return this;
             }
 
@@ -65,7 +65,7 @@ namespace IfcCreator.Interface.DTO
             {
                 foreach(Representation representation in representations)
                 {
-                    this.product.represenations.Add(representation);
+                    this.product.representations.Add(representation);
                 }
                 return this;
             }

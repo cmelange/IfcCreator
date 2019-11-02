@@ -2,9 +2,9 @@ namespace IfcCreator.Interface.DTO
 {
     public class Person
     {
-        public string givenName {get; private set; }
-        public string familyName {get; private set; }
-        public string identifier {get; private set; }
+        public string givenName {get; set; }
+        public string familyName {get; set; }
+        public string identifier {get; set; }
 
         private Person() {
             this.givenName = "";

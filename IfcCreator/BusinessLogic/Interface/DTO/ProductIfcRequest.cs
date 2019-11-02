@@ -10,13 +10,13 @@ namespace IfcCreator.Interface.DTO
     public class ProductIfcRequest
     {
         [Required]
-        public Project project {get; private set; }
+        public Project project {get; set; }
         [Required]
-        public OwnerHistory owner {get; private set; }
+        public OwnerHistory owner {get; set; }
         [Required]
-        public Product product {get; private set; }
+        public Product product {get; set; }
         [Required]
-        public IfcSchema schema {get; private set; }
+        public IfcSchema schema {get; set; }
 
         private ProductIfcRequest()
         {

@@ -2,10 +2,10 @@ namespace IfcCreator.Interface.DTO
 {
     public class Application
     {
-        public string name {get; private set; }
-        public string version {get; private set; }
-        public string identifier {get; private set; }
-        public Organization organization {get; private set; }
+        public string name {get; set; }
+        public string version {get; set; }
+        public string identifier {get; set; }
+        public Organization organization {get; set; }
 
         private Application()
         {

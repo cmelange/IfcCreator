@@ -56,6 +56,7 @@ namespace IfcCreator.Ifc
 
                     currentPosition = stream.Position;
                 }
+                stream.Seek( 0, SeekOrigin.Begin );
             }
         }
     }

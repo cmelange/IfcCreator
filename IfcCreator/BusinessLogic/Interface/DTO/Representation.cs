@@ -4,7 +4,7 @@ namespace IfcCreator.Interface.DTO
 {
     public class Representation
     {
-        public List<RepresentationItem> representationItems {get; private set; }
+        public List<RepresentationItem> representationItems {get; set; }
 
         private Representation()
         {

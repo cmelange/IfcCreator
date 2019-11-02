@@ -65,7 +65,7 @@ namespace IfcCreator
             List<IfcRepresentationContext> contextList = 
                 new List<IfcRepresentationContext> (project.RepresentationContexts);
             product.Representation = 
-                CreateProductRepresentation(contextList, request.product.represenations);
+                CreateProductRepresentation(contextList, request.product.representations);
             storey.Contains(product, ownerHistory);
             project.SerializeToStep(outputStream, request.schema.ToString(), null);
             return;
