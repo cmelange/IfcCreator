@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using IfcCreator.Interface;
+using IfcCreator.ExceptionHandling;
 
 namespace IfcCreator
 {
@@ -28,6 +29,10 @@ namespace IfcCreator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.Configure<ApiBehaviorOptions>(options =>
+                {
+                    options.InvalidModelStateResponseFactory = ctx => new ValidationErrorActionResult();
+                });
             services.AddSingleton<IProductIfcCreator, ProductIfcCreator>();
         }
 
@@ -45,6 +50,7 @@ namespace IfcCreator
                 app.UseHttpsRedirection();
             }
 
+            app.ConfigureGlobalExceptionMiddleware();
             app.UseMvc();
         }
     }

@@ -51,4 +51,4 @@ product_ifc_request = {
 }
 
 r = requests.post(url, json=product_ifc_request, headers=headers, verify=False)
-print(str(r.status_code) + r.text)
+print(str(r.status_code) + ' - ' r.text)

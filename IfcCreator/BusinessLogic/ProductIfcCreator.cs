@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,6 +14,7 @@ using IfcCreator.Ifc;
 using IfcCreator.Ifc.Geom;
 using IfcCreator.Interface;
 using IfcCreator.Interface.DTO;
+using IfcCreator.ExceptionHandling;
 
 namespace IfcCreator
 {
@@ -93,7 +95,16 @@ namespace IfcCreator
             var representationItemList = new List<IfcRepresentationItem>();
             foreach(RepresentationItem item in representation.representationItems)
             {
-                representationItemList.Add(RepresentationParser.ParseConstructionString(item.constructionString));
+                try
+                {
+                    representationItemList.Add(RepresentationParser.ParseConstructionString(item.constructionString));
+                }
+                catch (ArgumentException ex)
+                {
+                    var errors = new Dictionary<string, string[]>();
+                    errors.Add(ex.ParamName, new string[]{ ex.Message });
+                    throw new ValidationException(errors, ex.Message);
+                }
             }
             return new IfcShapeRepresentation(context,
                                               new IfcLabel("Body"),
