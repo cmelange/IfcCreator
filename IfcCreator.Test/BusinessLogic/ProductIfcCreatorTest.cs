@@ -61,9 +61,20 @@ namespace IfcCreator
             string productName = "test product";
             string productDescription = "product for test purposes";
             string constructionString = "POLYGON_SHAPE([[[0,0],[0,1],[1,1],[1,0]]]).EXTRUDE(1)";
-            RepresentationItem representationItem =new RepresentationItem(constructionString);
+            RepresentationItem representationItem0 =
+                new RepresentationItem.Builder()
+                                      .withConstructionString(constructionString)
+                                      .Build();
+            RepresentationItem representationItem1 =
+                new RepresentationItem.Builder()
+                                      .withConstructionString(constructionString)
+                                      .withTransformation(new Transformation.Builder()
+                                                                            .withTranslation(new double[] {2,0,0})
+                                                                            .Build())
+                                      .Build();
             Representation representation = 
-                new Representation.Builder().AddRepresentationItem(representationItem)
+                new Representation.Builder().AddRepresentationItem(representationItem0)
+                                            .AddRepresentationItem(representationItem1)
                                             .Build();
             Product product =
                 new Product.Builder().withName(productName)
@@ -110,28 +121,35 @@ namespace IfcCreator
             Assert.Equal(applicationName, parsedowner.OwningApplication.ApplicationFullName);
             Assert.Equal(applicationVersion, parsedowner.OwningApplication.Version);
             Assert.Equal(applicationIdentifier, parsedowner.OwningApplication.ApplicationIdentifier.Value);
-            IfcSite parsedSite = (IfcSite) GetFirst(GetFirst(parsedProject.IsDecomposedBy).RelatedObjects);
+            IfcSite parsedSite = (IfcSite) GetItem(GetItem(parsedProject.IsDecomposedBy,0).RelatedObjects,0);
             Assert.Equal(personGivenName, parsedSite.OwnerHistory.OwningUser.ThePerson.GivenName);
-            IfcBuilding parsedBuilding = (IfcBuilding) GetFirst(GetFirst(parsedSite.IsDecomposedBy).RelatedObjects);
+            IfcBuilding parsedBuilding = (IfcBuilding) GetItem(GetItem(parsedSite.IsDecomposedBy,0).RelatedObjects,0);
             Assert.Equal(personGivenName, parsedBuilding.OwnerHistory.OwningUser.ThePerson.GivenName);
-            IfcBuildingStorey parsedStorey = (IfcBuildingStorey) GetFirst(GetFirst(parsedBuilding.IsDecomposedBy).RelatedObjects);
+            IfcBuildingStorey parsedStorey = (IfcBuildingStorey) GetItem(GetItem(parsedBuilding.IsDecomposedBy,0).RelatedObjects,0);
             Assert.Equal(personGivenName, parsedStorey.OwnerHistory.OwningUser.ThePerson.GivenName);
-            IfcProduct parsedProduct = (IfcProduct) GetFirst(GetFirst(parsedStorey.ContainsElements).RelatedElements);
+            IfcProduct parsedProduct = (IfcProduct) GetItem(GetItem(parsedStorey.ContainsElements,0).RelatedElements,0);
             Assert.Equal(personGivenName, parsedProduct.OwnerHistory.OwningUser.ThePerson.GivenName);
             Assert.Equal(productName, parsedProduct.Name);
             Assert.Equal(productDescription, parsedProduct.Description);
             Assert.Equal(1, parsedProduct.Representation.Representations.Count);
-            IfcRepresentation parsedShapeRepresentation = GetFirst(parsedProduct.Representation.Representations);
+            IfcRepresentation parsedShapeRepresentation = GetItem(parsedProduct.Representation.Representations,0);
             Assert.Equal("Body", parsedShapeRepresentation.RepresentationIdentifier);
             Assert.Equal("SolidModel", parsedShapeRepresentation.RepresentationType);
-            Assert.Equal(1, parsedShapeRepresentation.Items.Count);
-            Assert.IsType<IfcExtrudedAreaSolid>(GetFirst(parsedShapeRepresentation.Items));
+            Assert.Equal(2, parsedShapeRepresentation.Items.Count);
+            Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,0));
+            Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,1));
+            Assert.Equal(1, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[0].Value);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[1].Value);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[2].Value);
         }
 
-        private T GetFirst<T>(IEnumerable<T> enumerable)
+        private T GetItem<T>(IEnumerable<T> enumerable, int index)
         {
             var enumerator = enumerable.GetEnumerator();
-            enumerator.MoveNext();
+            for (int i=0; i <= index; ++i)
+            {
+                enumerator.MoveNext();
+            }
             return enumerator.Current;
         }
 

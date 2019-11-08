@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace IfcCreator.Interface.DTO
 {
     public enum IfcSchema {

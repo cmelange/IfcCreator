@@ -1,5 +1,6 @@
 using System;
 
+using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcGeometryResource;
 
 namespace IfcCreator.Ifc.Geom
@@ -106,6 +107,34 @@ namespace IfcCreator.Ifc.Geom
                                       placement3D.Location.Coordinates[2].Value + translation[2]);
             placement3D.Location = newPosition;
             return placement3D;
+        }
+
+        public static IfcRepresentationItem Translate(this IfcRepresentationItem representation,
+                                                      double[] translation)
+        {
+            if (representation is IfcBooleanResult)
+            {
+                ((IfcBooleanResult) representation).Translate(translation);
+            }
+            if (representation is IfcSweptAreaSolid)
+            {
+                ((IfcSweptAreaSolid) representation).Translate(translation);
+            }
+            return representation;
+        }
+
+        public static IfcRepresentationItem Rotate(this IfcRepresentationItem representation,
+                                                   double[] rotation)
+        {
+            if (representation is IfcBooleanResult)
+            {
+                ((IfcBooleanResult) representation).Rotate(rotation);
+            }
+            if (representation is IfcSweptAreaSolid)
+            {
+                ((IfcSweptAreaSolid) representation).Rotate(rotation);
+            }
+            return representation;
         }
     }
 }

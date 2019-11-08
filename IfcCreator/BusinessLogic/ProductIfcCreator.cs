@@ -95,9 +95,10 @@ namespace IfcCreator
             var representationItemList = new List<IfcRepresentationItem>();
             foreach(RepresentationItem item in representation.representationItems)
             {
+                IfcRepresentationItem representationItem;
                 try
                 {
-                    representationItemList.Add(RepresentationParser.ParseConstructionString(item.constructionString));
+                    representationItem = RepresentationParser.ParseConstructionString(item.constructionString);
                 }
                 catch (ArgumentException ex)
                 {
@@ -105,6 +106,15 @@ namespace IfcCreator
                     errors.Add(ex.ParamName, new string[]{ ex.Message });
                     throw new ValidationException(errors, ex.Message);
                 }
+
+                if (item.transformation != null)
+                {
+                    representationItem.Translate(item.transformation.translation)
+                                      .Rotate(item.transformation.rotation);
+                }
+                
+                representationItemList.Add(representationItem);
+                
             }
             return new IfcShapeRepresentation(context,
                                               new IfcLabel("Body"),
