@@ -42,20 +42,23 @@ namespace IfcCreator.Ifc.Geom
             return axis;
         }
 
+        /**
+         *  calculates the Euler intrinsic rotation matrix in the order XY'Z" (Tait-Bryan angles)
+         */
         private static double[][] RotationMatrix3D(double[] rotation)
         {
             double[] theta = new double[] {ToRadians(rotation[0]), ToRadians(rotation[0]), ToRadians(rotation[0])};
 
-            double cosa = Math.Cos(theta[0]);
-            double sina = Math.Sin(theta[0]);
-            double cosb = Math.Cos(theta[1]);
-            double sinb = Math.Sin(theta[1]);
-            double cosc = Math.Cos(theta[2]);
-            double sinc = Math.Sin(theta[2]);
+            double c1 = Math.Cos(theta[0]);
+            double s1 = Math.Sin(theta[0]);
+            double c2 = Math.Cos(theta[1]);
+            double s2 = Math.Sin(theta[1]);
+            double c3 = Math.Cos(theta[2]);
+            double s3 = Math.Sin(theta[2]);
 
-            return new double[][] { new double[] {cosb*cosc, -cosb*sinc, sinb},
-                                    new double[] {sina*sinb*cosc + cosa*sinc, -sina*sinb*sinc + cosa*cosc, -sina*cosb},
-                                    new double[] {-cosa*sinb*cosc + sina*sinc, cosa*sinb*sinc + sina*cosc, cosa*cosb}};
+            return new double[][] { new double[] {c1*c2, c1*s2*s3-c3*s1, s1*s3 + c1*c3*s2},
+                                    new double[] {c2*s1, c1*c3 + s1*s2*s3, c3*s1*s2 - c1*s3},
+                                    new double[] {-s2, c2*s3, c2*c3}};
         }
 
         private static IfcDirection ApplyMatrix3(this IfcDirection direction,
