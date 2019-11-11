@@ -47,7 +47,7 @@ namespace IfcCreator.Ifc.Geom
          */
         private static double[][] RotationMatrix3D(double[] rotation)
         {
-            double[] theta = new double[] {ToRadians(rotation[0]), ToRadians(rotation[0]), ToRadians(rotation[0])};
+            double[] theta = new double[] {ToRadians(rotation[0]), ToRadians(rotation[1]), ToRadians(rotation[2])};
 
             double c1 = Math.Cos(theta[0]);
             double s1 = Math.Sin(theta[0]);
@@ -56,9 +56,10 @@ namespace IfcCreator.Ifc.Geom
             double c3 = Math.Cos(theta[2]);
             double s3 = Math.Sin(theta[2]);
 
-            return new double[][] { new double[] {c1*c2, c1*s2*s3-c3*s1, s1*s3 + c1*c3*s2},
-                                    new double[] {c2*s1, c1*c3 + s1*s2*s3, c3*s1*s2 - c1*s3},
-                                    new double[] {-s2, c2*s3, c2*c3}};
+
+            return new double[][] { new double[] {c2*c3, -c2*s3, s2},
+                                    new double[] {c1*s3 + c3*s1*s2, c1*c3 - s1*s2*s3, -c2*s1},
+                                    new double[] {s1*s3 - c1*c3*s2, c3*s1 + c1*s2*s3, c1*c2}};
         }
 
         private static IfcDirection ApplyMatrix3(this IfcDirection direction,

@@ -246,14 +246,14 @@ namespace IfcCreator.Ifc.Geom
                                                                         null,
                                                                         outerCurve);
             operandStack.Push(profileDef.Extrude(1));
-            operandStack.Push("[90,90,90]");
+            operandStack.Push("[-90,0,90]");
             ConstructionOperations.ExecuteOperation(OperationName.ROTATION, operandStack);
             Assert.Single(operandStack);
             var response = operandStack.Pop();
             Assert.IsAssignableFrom<IfcSweptAreaSolid>(response);
             Assert.Equal(0, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[0].Value, 10);
             Assert.Equal(0, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[1].Value, 10);
-            Assert.Equal(1, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[2].Value, 10);
+            Assert.Equal(-1, ((IfcSweptAreaSolid) response).Position.RefDirection.DirectionRatios[2].Value, 10);
 
             // ==== Rotate IfcBooleanResult
             operandStack.Clear();
@@ -266,17 +266,17 @@ namespace IfcCreator.Ifc.Geom
                                                           new IfcPositiveLengthMeasure(1),
                                                           new IfcPositiveLengthMeasure(1));
             operandStack.Push(union_first.Union(union_second));
-            operandStack.Push("[90,90,90]");
+            operandStack.Push("[-90,0,90]");
             ConstructionOperations.ExecuteOperation(OperationName.ROTATION, operandStack);
             Assert.Single(operandStack);
             response = operandStack.Pop();
             Assert.IsAssignableFrom<IfcBooleanResult>(response);
             Assert.Equal(0, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).FirstOperand).Position.RefDirection.DirectionRatios[0].Value, 10);
             Assert.Equal(0, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).FirstOperand).Position.RefDirection.DirectionRatios[1].Value, 10);
-            Assert.Equal(1, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).FirstOperand).Position.RefDirection.DirectionRatios[2].Value, 10);
+            Assert.Equal(-1, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).FirstOperand).Position.RefDirection.DirectionRatios[2].Value, 10);
             Assert.Equal(0, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).SecondOperand).Position.RefDirection.DirectionRatios[0].Value, 10);
             Assert.Equal(0, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).SecondOperand).Position.RefDirection.DirectionRatios[1].Value, 10);
-            Assert.Equal(1, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).SecondOperand).Position.RefDirection.DirectionRatios[2].Value, 10);
+            Assert.Equal(-1, ((IfcCsgPrimitive3D) ((IfcBooleanResult) response).SecondOperand).Position.RefDirection.DirectionRatios[2].Value, 10);
         }        
 
         [Fact]

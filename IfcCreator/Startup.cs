@@ -24,6 +24,8 @@ namespace IfcCreator
             Configuration = configuration;
         }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,6 +36,16 @@ namespace IfcCreator
                 {
                     options.InvalidModelStateResponseFactory = ctx => new ValidationErrorActionResult();
                 });
+            services.AddCors(options => 
+                {
+                    options.AddPolicy(MyAllowSpecificOrigins,
+                                      builder => 
+                                      {
+                                          builder.AllowAnyOrigin();
+                                          builder.AllowAnyMethod();
+                                          builder.AllowAnyHeader();
+                                      });
+                });
             services.AddSingleton<IProductIfcCreator, ProductIfcCreator>();
             services.AddSingleton<IResponseHelper, ResponseHelper>();
         }
@@ -43,7 +55,8 @@ namespace IfcCreator
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+                app.UseCors(MyAllowSpecificOrigins);
             }
             else
             {

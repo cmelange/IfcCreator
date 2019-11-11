@@ -138,7 +138,7 @@ namespace IfcCreator
             Assert.Equal(2, parsedShapeRepresentation.Items.Count);
             Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,0));
             Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,1));
-            Assert.Equal(1, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[0].Value);
+            Assert.Equal(2, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[0].Value);
             Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[1].Value);
             Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[2].Value);
         }
