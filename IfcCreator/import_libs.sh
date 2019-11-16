@@ -1,5 +1,5 @@
 dotnet nuget locals all --clear
-git clone https://github.com/cmelange/IfcDoc.git ifc-kit
+git clone --single-branch --branch NET_Core https://github.com/cmelange/IfcDoc.git ifc-kit
 cd ./ifc-kit/IfcKit
 ./build.sh
 cp ./nupkgs/* ../../lib
