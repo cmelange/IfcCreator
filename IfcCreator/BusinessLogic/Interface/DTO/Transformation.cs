@@ -7,8 +7,12 @@ namespace IfcCreator.Interface.DTO
         [MinLength(2)]
         [MaxLength(3)]
         public double[] translation {get; set; }
-        [MinLength(2)]
-        [MaxLength(3)]
+        [MinLength(1)]
+        [MaxLength(4)]
+        /**
+         *  rotation is represented by either a single angle in degree (2D shapes)
+         *  or by a quaternion in the format [w, x , y, z]
+         **/
         public double[] rotation {get; set; }
         [Range(double.Epsilon, double.MaxValue)]
         public double scale;
@@ -16,7 +20,7 @@ namespace IfcCreator.Interface.DTO
         private Transformation()
         {
             this.translation = new double[] {0,0,0};
-            this.rotation = new double[] {0,0,0};
+            this.rotation = new double[] {1,0,0,0};
             this.scale = 1.0;
         }
 

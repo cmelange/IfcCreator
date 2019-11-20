@@ -193,7 +193,7 @@ namespace IfcCreator.Ifc.Geom
             operandStack.Push(firstOperand.Intersection(secondOperand));
         }
 
-        private static double[] ParseVector(string vector)
+        private static double[] ParseArray(string vector)
         {
             //remove all spaces
             vector.Replace(" ", "");
@@ -221,17 +221,18 @@ namespace IfcCreator.Ifc.Geom
                         break;
                 }
             }
-            if (result.Count != 3)
-            {
-                throw new ArgumentException("Vector should have exactely 3 coordinates");
-            }
             return result.ToArray();
         }
         
         private static void Translate(Stack operandStack)
         {
             var operand = (string) operandStack.Pop();
-            double[] translationVector = ParseVector(operand);
+            double[] translationVector = ParseArray(operand);
+            
+            if (translationVector.Length != 3)
+            {
+                throw new ArgumentException("Vector should have exactely 3 coordinates");
+            }
 
             var item = operandStack.Pop();
             if (item is IfcSweptAreaSolid)
@@ -250,7 +251,7 @@ namespace IfcCreator.Ifc.Geom
         private static void Rotate(Stack operandStack)
         {
             var operand = (string) operandStack.Pop();
-            double[] rotation = ParseVector(operand);
+            double[] rotation = ParseArray(operand);
 
             var item = operandStack.Pop();
             if (item is IfcSweptAreaSolid)
@@ -274,7 +275,7 @@ namespace IfcCreator.Ifc.Geom
             operand.Replace(" ", "");
             int splitPos = operand.IndexOf("],") + 1;
             //plane equation is n[0]*x + n[1]*y + n[2]*z = d
-            double[] normal = ParseVector(operand.Substring(0,splitPos));
+            double[] normal = ParseArray(operand.Substring(0,splitPos));
             double d = Double.Parse(operand.Substring(splitPos + 1, operand.Length - splitPos - 1));
             //find point on plane
             double[] point = new double[] {0,0,0};

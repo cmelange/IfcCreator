@@ -109,8 +109,8 @@ namespace IfcCreator
 
                 if (item.transformation != null)
                 {
-                    representationItem.Translate(item.transformation.translation)
-                                      .Rotate(item.transformation.rotation);
+                    representationItem.ApplyQuaternion(new Quaternion(item.transformation.rotation))
+                                      .Translate(item.transformation.translation);
                 }
                 
                 representationItemList.Add(representationItem);

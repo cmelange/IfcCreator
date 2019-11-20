@@ -12,6 +12,7 @@ using BuildingSmart.Serialization.Step;
 
 using IfcCreator.Interface;
 using IfcCreator.Interface.DTO;
+using IfcCreator.Ifc.Geom;
 
 namespace IfcCreator
 {
@@ -65,11 +66,14 @@ namespace IfcCreator
                 new RepresentationItem.Builder()
                                       .withConstructionString(constructionString)
                                       .Build();
+            var rotationQ = new Quaternion();
+            rotationQ.SetFromEuler(new double[] {90, 90, 90} );
             RepresentationItem representationItem1 =
                 new RepresentationItem.Builder()
                                       .withConstructionString(constructionString)
                                       .withTransformation(new Transformation.Builder()
                                                                             .withTranslation(new double[] {2,0,0})
+                                                                            .withRotation(rotationQ.ToArray())
                                                                             .Build())
                                       .Build();
             Representation representation = 
@@ -141,6 +145,12 @@ namespace IfcCreator
             Assert.Equal(2, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[0].Value);
             Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[1].Value);
             Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Location.Coordinates[2].Value);
+            Assert.Equal(1, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Axis.DirectionRatios[0].Value, 5);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Axis.DirectionRatios[1].Value, 5);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.Axis.DirectionRatios[2].Value, 5);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.RefDirection.DirectionRatios[0].Value, 5);
+            Assert.Equal(0, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.RefDirection.DirectionRatios[1].Value, 5);
+            Assert.Equal(1, ((IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1)).Position.RefDirection.DirectionRatios[2].Value, 5);
         }
 
         private T GetItem<T>(IEnumerable<T> enumerable, int index)

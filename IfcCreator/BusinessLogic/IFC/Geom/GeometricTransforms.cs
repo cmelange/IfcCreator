@@ -76,8 +76,19 @@ namespace IfcCreator.Ifc.Geom
             return new IfcDirection(newDirection[0], newDirection[1], newDirection[2]);
         }
 
+        private static IfcDirection ApplyQuaternion(this IfcDirection direction,
+                                                    Quaternion q)
+        {
+            var directionQ = new Quaternion(0,
+                                            direction.DirectionRatios[0].Value,
+                                            direction.DirectionRatios[1].Value,
+                                            direction.DirectionRatios[2].Value);
+            Quaternion result = q.Multiply(directionQ.Multiply(q.Conjugate()));
+            return new IfcDirection(result.x, result.y, result.z);
+        }
+
         private static IfcCartesianPoint ApplyMatrix3(this IfcCartesianPoint location,
-                                                 double[][] matrix)
+                                                      double[][] matrix)
         {
             double[] newPoint = {0,0,0};
             for (int i=0; i<3; ++i)
@@ -90,6 +101,17 @@ namespace IfcCreator.Ifc.Geom
             return new IfcCartesianPoint(newPoint[0], newPoint[1], newPoint[2]);
         }
 
+        private static IfcCartesianPoint ApplyQuaternion(this IfcCartesianPoint location,
+                                                         Quaternion q)
+        {
+            var pointQ = new Quaternion(0,
+                                        location.Coordinates[0].Value,
+                                        location.Coordinates[1].Value,
+                                        location.Coordinates[2].Value);
+            Quaternion result = q.Multiply(pointQ.Multiply(q.Conjugate()));
+            return new IfcCartesianPoint(result.x, result.y, result.z);
+        }
+
         public static IfcAxis2Placement3D Rotate(this IfcAxis2Placement3D placement3D,
                                                  double[] rotation)
         {
@@ -99,6 +121,17 @@ namespace IfcCreator.Ifc.Geom
             placement3D.RefDirection = refDirection.ApplyMatrix3(rotationMatrix);
             placement3D.Axis = axis.ApplyMatrix3(rotationMatrix);
             placement3D.Location = placement3D.Location.ApplyMatrix3(rotationMatrix);
+            return placement3D;
+        }
+
+        public static IfcAxis2Placement3D ApplyQuaternion(this IfcAxis2Placement3D placement3D,
+                                                         Quaternion q)
+        {
+            IfcDirection refDirection = placement3D.RefDirection ?? new IfcDirection(1,0,0);
+            IfcDirection axis = placement3D.Axis ?? new IfcDirection(0,0,1);
+            placement3D.RefDirection = refDirection.ApplyQuaternion(q);
+            placement3D.Axis = axis.ApplyQuaternion(q);
+            placement3D.Location = placement3D.Location.ApplyQuaternion(q);
             return placement3D;
         }
 
@@ -140,5 +173,20 @@ namespace IfcCreator.Ifc.Geom
             }
             return representation;
         }
+
+        public static IfcRepresentationItem ApplyQuaternion(this IfcRepresentationItem representation,
+                                                            Quaternion q)
+        {
+            if (representation is IfcBooleanResult)
+            {
+                ((IfcBooleanResult) representation).ApplyQuaternion(q);
+            }
+            if (representation is IfcSweptAreaSolid)
+            {
+                ((IfcSweptAreaSolid) representation).ApplyQuaternion(q);
+            }
+            return representation;
+        }
+
     }
 }

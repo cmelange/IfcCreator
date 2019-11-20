@@ -58,5 +58,12 @@ namespace IfcCreator.Ifc.Geom
             representation.Position.Rotate(rotation);
             return representation;
         }
+
+        public static IfcSweptAreaSolid ApplyQuaternion(this IfcSweptAreaSolid representation,
+                                                        Quaternion q)
+        {
+            representation.Position.ApplyQuaternion(q);
+            return representation;
+        }
     }
 }

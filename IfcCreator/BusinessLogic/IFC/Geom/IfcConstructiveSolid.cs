@@ -123,5 +123,44 @@ namespace IfcCreator.Ifc.Geom
             }
             return representation;
         }
+
+        public static IfcBooleanResult ApplyQuaternion(this IfcBooleanResult representation,
+                                                       Quaternion q)
+        {   //An IfcBooleanResult is rotated by recursively rotating every operand
+
+            // === first operand
+            if (representation.FirstOperand is IfcSweptAreaSolid)
+            {
+                ((IfcSweptAreaSolid) representation.FirstOperand).ApplyQuaternion(q);
+            }
+            if (representation.FirstOperand is IfcBooleanResult)
+            {
+                ((IfcBooleanResult) representation.FirstOperand).ApplyQuaternion(q);
+            }
+            if (representation.FirstOperand is IfcCsgPrimitive3D)
+            {
+                ((IfcCsgPrimitive3D) representation.FirstOperand).Position.ApplyQuaternion(q);
+            }
+
+            // === second operand
+            if (representation.SecondOperand is IfcSweptAreaSolid)
+            {
+                ((IfcSweptAreaSolid) representation.SecondOperand).ApplyQuaternion(q);
+            }
+            if (representation.SecondOperand is IfcBooleanResult)
+            {
+                ((IfcBooleanResult) representation.SecondOperand).ApplyQuaternion(q);
+            }
+            if (representation.SecondOperand is IfcCsgPrimitive3D)
+            {
+                ((IfcCsgPrimitive3D) representation.SecondOperand).Position.ApplyQuaternion(q);
+            }
+            if (representation.SecondOperand is IfcHalfSpaceSolid)
+            {
+                ((IfcPlane) ((IfcHalfSpaceSolid) representation.SecondOperand).BaseSurface)
+                    .Position.ApplyQuaternion(q);
+            }
+            return representation;
+        }
     }
 }
