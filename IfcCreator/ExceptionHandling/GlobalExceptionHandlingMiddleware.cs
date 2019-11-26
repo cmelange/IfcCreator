@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace IfcCreator.ExceptionHandling
 {
@@ -24,6 +25,12 @@ namespace IfcCreator.ExceptionHandling
             try
             {
                 await _next(httpContext);
+            }
+            catch (ArgumentException ex)
+            {
+                var paramDictionary = new Dictionary<string, string[]>();
+                paramDictionary.Add(ex.ParamName??"unknown", new string[] {"Invalid argument"});
+                await HandleExceptionAsync(httpContext, new ValidationException(paramDictionary, ex.Message));
             }
             catch (ReportableException ex)
             {

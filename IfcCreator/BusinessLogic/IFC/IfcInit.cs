@@ -10,6 +10,8 @@ using BuildingSmart.IFC.IfcDateTimeResource;
 using BuildingSmart.IFC.IfcRepresentationResource;
 using BuildingSmart.IFC.IfcGeometryResource;
 using BuildingSmart.IFC.IfcGeometricConstraintResource;
+using BuildingSmart.IFC.IfcPresentationAppearanceResource;
+using IfcCreator.Interface.DTO;
 
 namespace IfcCreator.Ifc
 {
@@ -214,5 +216,33 @@ namespace IfcCreator.Ifc
                                 IfcObjectTypeEnum.PRODUCT,
                                 null);   //__Tag
         }
+
+        public static IfcSurfaceStyle CreateSurfaceStyle(string name,
+                                                         ColorRGBa color,
+                                                         bool metal,
+                                                         double roughness)
+        {
+            IfcSurfaceStyle surfaceStyle = new IfcSurfaceStyle(new IfcLabel(name),
+                                                               IfcSurfaceSide.BOTH,
+                                                               new IfcSurfaceStyleShading[] {});
+            var reflectanceMethod = (metal) ? IfcReflectanceMethodEnum.METAL : IfcReflectanceMethodEnum.PHONG;
+            var surfaceStyleRendering = new IfcSurfaceStyleRendering(new IfcColourRgb(null,  //name
+                                                                                      new IfcNormalisedRatioMeasure(color.red),
+                                                                                      new IfcNormalisedRatioMeasure(color.green),
+                                                                                      new IfcNormalisedRatioMeasure(color.blue)),
+                                                                     new IfcNormalisedRatioMeasure(1 - color.alpha),
+                                                                     new IfcNormalisedRatioMeasure(0.9),     //diffuse color = color * 0.9
+                                                                     new IfcNormalisedRatioMeasure(1),       //transmission = transparancy * 1
+                                                                     new IfcNormalisedRatioMeasure(0),       //diffuse transmission = 0
+                                                                     new IfcNormalisedRatioMeasure(0),       //reflection = 0 (only applicable to GLASS and MIRROR model)
+                                                                     new IfcColourRgb(null,  //name
+                                                                                      new IfcNormalisedRatioMeasure(1),
+                                                                                      new IfcNormalisedRatioMeasure(1),
+                                                                                      new IfcNormalisedRatioMeasure(1)),  //specular color = white 
+                                                                     new IfcSpecularRoughness(roughness),                 //specular highlight
+                                                                     reflectanceMethod);                                  //reflectance method
+            return surfaceStyle;
+        }
+        
     }
 }

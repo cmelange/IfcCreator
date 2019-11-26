@@ -12,14 +12,14 @@ namespace IfcCreator.Interface.DTO
             this.name = "";
             this.version = "";
             this.identifier = "";
-            this.organization = new Organization.Builder().Build();
+            this.organization = new Organization.Builder().build();
         }
 
         public class Builder
         {
             private Application application = new Application();
 
-            public Application Build()
+            public Application build()
             {
                 return this.application;
             }

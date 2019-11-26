@@ -33,7 +33,7 @@ namespace IfcCreator.Interface.DTO
         {
             protected T product;
 
-            public T Build()
+            public T build()
             {
                 return this.product;
             }

@@ -1,6 +1,8 @@
 using BuildingSmart.IFC.IfcKernel;
 using BuildingSmart.IFC.IfcUtilityResource;
 using BuildingSmart.IFC.IfcProductExtension;
+using BuildingSmart.IFC.IfcGeometryResource;
+using BuildingSmart.IFC.IfcPresentationAppearanceResource;
 
 namespace IfcCreator.Ifc
 {
@@ -52,6 +54,13 @@ namespace IfcCreator.Ifc
                                                           relatedObjects,
                                                           relatingObject);
             relatingObject.ContainsElements.Add(relation);
+        }
+
+        public static void StyledBy(this IfcRepresentationItem relatingItem,
+                                    IfcPresentationStyle[] styles)
+        {
+            IfcStyledItem styledItem = new IfcStyledItem(relatingItem, styles, null);
+            relatingItem.StyledByItem.Add(styledItem);
         }
     }
 }

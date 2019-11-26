@@ -28,7 +28,7 @@ namespace IfcCreator.Interface.DTO
         {
             private ProductIfcRequest request = new ProductIfcRequest();
 
-            public ProductIfcRequest Build()
+            public ProductIfcRequest build()
             {
                 return this.request;
             }

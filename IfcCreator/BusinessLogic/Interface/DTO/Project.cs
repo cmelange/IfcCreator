@@ -14,7 +14,7 @@ namespace IfcCreator.Interface.DTO
         {
             private Project project = new Project();
 
-            public Project Build()
+            public Project build()
             {
                 return this.project;
             }

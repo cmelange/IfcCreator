@@ -9,6 +9,7 @@ using BuildingSmart.IFC.IfcUtilityResource;
 using BuildingSmart.IFC.IfcRepresentationResource;
 using BuildingSmart.IFC.IfcMeasureResource;
 using BuildingSmart.IFC.IfcGeometryResource;
+using BuildingSmart.IFC.IfcPresentationAppearanceResource;
 
 using IfcCreator.Ifc;
 using IfcCreator.Ifc.Geom;
@@ -92,6 +93,26 @@ namespace IfcCreator
         private IfcShapeRepresentation CreateShapeRepresentation(IfcRepresentationContext context,
                                                                  Representation representation)
         {
+            //create presentation styles
+            var presentationStyleDictionary = new Dictionary<String, IfcPresentationStyle>();
+            foreach (Material material in representation.materials)
+            {
+                try
+                {
+                    presentationStyleDictionary.Add(material.name,
+                                                    IfcInit.CreateSurfaceStyle(material.name,
+                                                                            material.color,
+                                                                            material.metal,
+                                                                            material.roughness));
+                }
+                catch(ArgumentException ex)
+                {
+                    throw new ArgumentException(string.Format("Material with name {0} already exists", material.name),
+                                                "materials", ex);
+                }
+            }
+
+            //create representation items
             var representationItemList = new List<IfcRepresentationItem>();
             foreach(RepresentationItem item in representation.representationItems)
             {
@@ -113,6 +134,15 @@ namespace IfcCreator
                                       .Translate(item.transformation.translation);
                 }
                 
+                if (item.material != null)
+                {
+                    IfcPresentationStyle surfaceStyle;
+                    if (presentationStyleDictionary.TryGetValue(item.material, out surfaceStyle))
+                    {
+                        representationItem.StyledBy(new IfcPresentationStyle[] {surfaceStyle});
+                    }
+                }
+
                 representationItemList.Add(representationItem);
                 
             }

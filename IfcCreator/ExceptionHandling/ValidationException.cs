@@ -16,7 +16,7 @@ namespace IfcCreator.ExceptionHandling
         {}
 
         private static ValidationProblemDetails UpdateProblemDetails(ValidationProblemDetails problemDetails,
-                                                              string msg)
+                                                                     string msg)
         {        
             problemDetails.Title = "Bad Request";
             problemDetails.Detail = msg;

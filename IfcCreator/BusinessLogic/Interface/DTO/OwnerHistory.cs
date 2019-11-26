@@ -8,9 +8,9 @@ namespace IfcCreator.Interface.DTO
 
         private OwnerHistory()
         {
-            this.person = new Person.Builder().Build();
-            this.organization = new Organization.Builder().Build();
-            this.application = new Application.Builder().Build();
+            this.person = new Person.Builder().build();
+            this.organization = new Organization.Builder().build();
+            this.application = new Application.Builder().build();
         }
 
         public class Builder
@@ -22,7 +22,7 @@ namespace IfcCreator.Interface.DTO
                 this.ownerHistory = new OwnerHistory();
             }
 
-            public OwnerHistory Build()
+            public OwnerHistory build()
             {
                 return this.ownerHistory;
             }

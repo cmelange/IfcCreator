@@ -28,7 +28,7 @@ namespace IfcCreator.Interface.DTO
         {
             private Transformation transformation = new Transformation();
 
-            public Transformation Build()
+            public Transformation build()
             {
                 return this.transformation;
             }

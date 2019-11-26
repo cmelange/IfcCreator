@@ -16,7 +16,7 @@ namespace IfcCreator.Interface.DTO
         {
             private Person person = new Person();
 
-            public Person Build()
+            public Person build()
             {
                 return this.person;
             }

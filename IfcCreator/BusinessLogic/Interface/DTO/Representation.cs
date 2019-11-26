@@ -6,6 +6,8 @@ namespace IfcCreator.Interface.DTO
     {
         public List<RepresentationItem> representationItems {get; set; }
 
+        public List<Material> materials {get; set; }
+
         private Representation()
         {
             this.representationItems = new List<RepresentationItem>();
@@ -15,7 +17,7 @@ namespace IfcCreator.Interface.DTO
         {
             private Representation representation = new Representation();
 
-            public Representation Build()
+            public Representation build()
             {
                 return this.representation;
             }
@@ -34,6 +36,17 @@ namespace IfcCreator.Interface.DTO
                 }
                 return this;
             }
+
+            public Builder addMaterial(Material material) {
+                this.representation.materials.Add(material);
+                return this;
+            }
+
+            public Builder addMaterials(List<Material> materials) {
+                this.representation.materials.AddRange(materials);
+                return this;
+            }
+
         }
     }
 }

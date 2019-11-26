@@ -27,7 +27,7 @@ namespace IfcCreator
             Project project = 
                 new Project.Builder().withName(projectName)
                                      .withDescription(projectDescription)
-                                     .Build();
+                                     .build();
             string personGivenName = "Cedric";
             string personFamilyName = "Mélange";
             string personIdentifier = "cmela";
@@ -35,7 +35,7 @@ namespace IfcCreator
                 new Person.Builder().withGivenName(personGivenName)
                                     .withFamilyName(personFamilyName)
                                     .withIdentifier(personIdentifier)
-                                    .Build();
+                                    .build();
             string organizationName = "EC Life";
             string organizationDescription = "EC Life - for an easy, economical and ecological life";
             string organizationIdentifier = "ECL";
@@ -43,7 +43,7 @@ namespace IfcCreator
                 new Organization.Builder().withName(organizationName)
                                           .withDescription(organizationDescription)
                                           .withIdentifier(organizationIdentifier)
-                                          .Build();
+                                          .build();
             string applicationName = "ECL IfcCreator";
             string applicationVersion = "1.0";
             string applicationIdentifier = "IfcCreator";
@@ -51,13 +51,13 @@ namespace IfcCreator
                 new Application.Builder().withName(applicationName)
                                          .withVersion(applicationVersion)
                                          .withIdentifier(applicationIdentifier)
-                                         .withOrganization(new Organization.Builder().Build())
-                                         .Build();
+                                         .withOrganization(new Organization.Builder().build())
+                                         .build();
             OwnerHistory owner = 
                 new OwnerHistory.Builder().withPerson(person)
                                           .withOrganization(organization)
                                           .withApllication(application)
-                                          .Build();
+                                          .build();
 
             string productName = "test product";
             string productDescription = "product for test purposes";
@@ -65,7 +65,7 @@ namespace IfcCreator
             RepresentationItem representationItem0 =
                 new RepresentationItem.Builder()
                                       .withConstructionString(constructionString)
-                                      .Build();
+                                      .build();
             var rotationQ = new Quaternion();
             rotationQ.SetFromEuler(new double[] {90, 90, 90} );
             RepresentationItem representationItem1 =
@@ -74,25 +74,25 @@ namespace IfcCreator
                                       .withTransformation(new Transformation.Builder()
                                                                             .withTranslation(new double[] {2,0,0})
                                                                             .withRotation(rotationQ.ToArray())
-                                                                            .Build())
-                                      .Build();
+                                                                            .build())
+                                      .build();
             Representation representation = 
                 new Representation.Builder().AddRepresentationItem(representationItem0)
                                             .AddRepresentationItem(representationItem1)
-                                            .Build();
+                                            .build();
             Product product =
                 new Product.Builder().withName(productName)
                                      .withDescription(productDescription)
                                      .withType(ProductType.PROXY)
                                      .addRepresenation(representation)
-                                     .Build();
+                                     .build();
             IfcSchema schema = IfcSchema.IFC2X3;
             ProductIfcRequest request = 
                 new ProductIfcRequest.Builder().withProject(project)
                                                .withOwner(owner)
                                                .withProduct(product)
                                                .withSchema(schema)
-                                               .Build();
+                                               .build();
 
             // === convert to IFC stream
             MemoryStream memStream = new MemoryStream();

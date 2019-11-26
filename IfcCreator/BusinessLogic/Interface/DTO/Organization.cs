@@ -16,7 +16,7 @@ namespace IfcCreator.Interface.DTO
         {
             private Organization organization = new Organization();
 
-            public Organization Build()
+            public Organization build()
             {
                 return this.organization;
             }
