@@ -11,6 +11,7 @@ namespace IfcCreator.Interface.DTO
         private Representation()
         {
             this.representationItems = new List<RepresentationItem>();
+            this.materials = new List<Material>();
         }
 
         public class Builder

@@ -241,6 +241,7 @@ namespace IfcCreator.Ifc
                                                                                       new IfcNormalisedRatioMeasure(1)),  //specular color = white 
                                                                      new IfcSpecularRoughness(roughness),                 //specular highlight
                                                                      reflectanceMethod);                                  //reflectance method
+            surfaceStyle.Styles.Add(surfaceStyleRendering);
             return surfaceStyle;
         }
         
