@@ -14,64 +14,102 @@ namespace IfcCreator.Ifc.Geom
     public class ConstructionOperationsTest
     {
         [Fact]
-        public void PolygonShapeTest()
+        public void Polyline2DTest()
         {
             var operandStack = new Stack();
-            operandStack.Push("[[[0,0],[1.0,1.0],[1,0]]]");
-            var operation = OperationName.POLYGON_SHAPE;
+            operandStack.Push("[[0,0],[1.0,1.0],[1,0]]");
+            var operation = OperationName.POLYLINE2D;
+            ConstructionOperations.ExecuteOperation(operation, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcPolyline>(response);
+            Assert.Collection(((IfcPolyline) response).Points,                         
+                              p0 => { Assert.Equal(0, p0.Coordinates[0].Value);
+                                      Assert.Equal(0, p0.Coordinates[1].Value); },
+                              p1 => { Assert.Equal(1, p1.Coordinates[0].Value);
+                                      Assert.Equal(1, p1.Coordinates[1].Value); },
+                              p2 => { Assert.Equal(1, p2.Coordinates[0].Value);
+                                      Assert.Equal(0, p2.Coordinates[1].Value); });
+        }
+
+        [Theory]
+        [InlineData("[0,1]")]
+        [InlineData("[[0,1]]")]
+        [InlineData("[[0,0],[1.0],[1,0]]")]
+        public void Polyline2DExceptionsTest(string operand)
+        {
+            var operandStack = new Stack();
+            operandStack.Push(operand);
+            var operation = OperationName.POLYLINE2D;
+            Assert.Throws<ArgumentException>(
+                () => ConstructionOperations.ExecuteOperation(operation, operandStack));
+        }
+
+        [Fact]
+        public void Shape()
+        {
+            var operandStack = new Stack();
+            IfcPolyline outerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-0.5, -0.5},
+                                                                                   new double[] {-0.5, 0.5},
+                                                                                   new double[] {0.5, 0.5},
+                                                                                   new double[] {0.5, -0.5},
+                                                                                   new double[] {-0.5, -0.5}});
+            operandStack.Push('{');
+            operandStack.Push(outerCurve);
+            var operation = OperationName.SHAPE;
             ConstructionOperations.ExecuteOperation(operation, operandStack);
             Assert.Single(operandStack);
             var response = operandStack.Pop();
             Assert.IsType<IfcArbitraryClosedProfileDef>(response);
             Assert.Collection(((IfcPolyline)((IfcArbitraryClosedProfileDef) response).OuterCurve).Points,
-                              p0 => { Assert.Equal(0, p0.Coordinates[0].Value);
-                                      Assert.Equal(0, p0.Coordinates[1].Value); },
-                              p1 => { Assert.Equal(1, p1.Coordinates[0].Value);
-                                      Assert.Equal(1, p1.Coordinates[1].Value); },
-                              p2 => { Assert.Equal(1, p2.Coordinates[0].Value);
-                                      Assert.Equal(0, p2.Coordinates[1].Value); },
-                              p3 => { Assert.Equal(0, p3.Coordinates[0].Value);
-                                      Assert.Equal(0, p3.Coordinates[1].Value); });
+                              p0 => { Assert.Equal(-0.5, p0.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p0.Coordinates[1].Value); },
+                              p1 => { Assert.Equal(-0.5, p1.Coordinates[0].Value);
+                                      Assert.Equal(0.5, p1.Coordinates[1].Value); },
+                              p2 => { Assert.Equal(0.5, p2.Coordinates[0].Value);
+                                      Assert.Equal(0.5, p2.Coordinates[1].Value); },
+                              p3 => { Assert.Equal(0.5, p3.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p3.Coordinates[1].Value); },
+                              p4 => { Assert.Equal(-0.5, p4.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p4.Coordinates[1].Value); });
 
-            operandStack.Push("[[[0,0],[1.0,1.0],[1,0]], [[0.5,0.5],[0.75,0.75],[0.75,0]]]");
+            IfcPolyline innerCurve = IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-0.25, -0.25},
+                                                                                   new double[] {-0.25, 0.25},
+                                                                                   new double[] {0.25, 0.25},
+                                                                                   new double[] {0.25, -0.25},
+                                                                                   new double[] {-0.25, -0.25}});
+            operandStack.Push('{');
+            operandStack.Push(outerCurve);
+            operandStack.Push(innerCurve);
             ConstructionOperations.ExecuteOperation(operation, operandStack);
             Assert.Single(operandStack);
             response = operandStack.Pop();
             Assert.IsType<IfcArbitraryProfileDefWithVoids>(response);
             Assert.Collection(((IfcPolyline)((IfcArbitraryProfileDefWithVoids) response).OuterCurve).Points,
-                              p0 => { Assert.Equal(0, p0.Coordinates[0].Value);
-                                      Assert.Equal(0, p0.Coordinates[1].Value); },
-                              p1 => { Assert.Equal(1, p1.Coordinates[0].Value);
-                                      Assert.Equal(1, p1.Coordinates[1].Value); },
-                              p2 => { Assert.Equal(1, p2.Coordinates[0].Value);
-                                      Assert.Equal(0, p2.Coordinates[1].Value); },
-                              p3 => { Assert.Equal(0, p3.Coordinates[0].Value);
-                                      Assert.Equal(0, p3.Coordinates[1].Value); });
+                              p0 => { Assert.Equal(-0.5, p0.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p0.Coordinates[1].Value); },
+                              p1 => { Assert.Equal(-0.5, p1.Coordinates[0].Value);
+                                      Assert.Equal(0.5, p1.Coordinates[1].Value); },
+                              p2 => { Assert.Equal(0.5, p2.Coordinates[0].Value);
+                                      Assert.Equal(0.5, p2.Coordinates[1].Value); },
+                              p3 => { Assert.Equal(0.5, p3.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p3.Coordinates[1].Value); },
+                              p4 => { Assert.Equal(-0.5, p4.Coordinates[0].Value);
+                                      Assert.Equal(-0.5, p4.Coordinates[1].Value); });
             Assert.Single(((IfcArbitraryProfileDefWithVoids) response).InnerCurves);
             var innerCurveEnumerator = ((IfcArbitraryProfileDefWithVoids) response).InnerCurves.GetEnumerator();
             innerCurveEnumerator.MoveNext();
             Assert.Collection(((IfcPolyline) innerCurveEnumerator.Current).Points,
-                              p0 => { Assert.Equal(0.5, p0.Coordinates[0].Value);
-                                      Assert.Equal(0.5, p0.Coordinates[1].Value); },
-                              p1 => { Assert.Equal(0.75, p1.Coordinates[0].Value);
-                                      Assert.Equal(0.75, p1.Coordinates[1].Value); },
-                              p2 => { Assert.Equal(0.75, p2.Coordinates[0].Value);
-                                      Assert.Equal(0, p2.Coordinates[1].Value); },
-                              p3 => { Assert.Equal(0.5, p3.Coordinates[0].Value);
-                                      Assert.Equal(0.5, p3.Coordinates[1].Value); });
-        }
-
-        [Theory]
-        [InlineData("[[0,1]]")]
-        [InlineData("[[[0,1]]]")]
-        [InlineData("[[[0,0],[1.0],[1,0]]]")]
-        public void PolygonShapeExceptionsTest(string operand)
-        {
-            var operandStack = new Stack();
-            operandStack.Push(operand);
-            var operation = OperationName.POLYGON_SHAPE;
-            Assert.Throws<ArgumentException>(
-                () => ConstructionOperations.ExecuteOperation(operation, operandStack));
+                              p0 => { Assert.Equal(-0.25, p0.Coordinates[0].Value);
+                                      Assert.Equal(-0.25, p0.Coordinates[1].Value); },
+                              p1 => { Assert.Equal(-0.25, p1.Coordinates[0].Value);
+                                      Assert.Equal(0.25, p1.Coordinates[1].Value); },
+                              p2 => { Assert.Equal(0.25, p2.Coordinates[0].Value);
+                                      Assert.Equal(0.25, p2.Coordinates[1].Value); },
+                              p3 => { Assert.Equal(0.25, p3.Coordinates[0].Value);
+                                      Assert.Equal(-0.25, p3.Coordinates[1].Value); },
+                              p4 => { Assert.Equal(-0.25, p4.Coordinates[0].Value);
+                                      Assert.Equal(-0.25, p4.Coordinates[1].Value); });
         }
 
         [Fact]

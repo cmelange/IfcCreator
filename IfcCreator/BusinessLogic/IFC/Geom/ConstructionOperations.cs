@@ -12,7 +12,8 @@ namespace IfcCreator.Ifc.Geom
 {
     public enum OperationName
     {
-        POLYGON_SHAPE,
+        POLYLINE2D,
+        SHAPE,
         EXTRUDE,
         REVOLVE,
         TRANSLATION,
@@ -33,8 +34,11 @@ namespace IfcCreator.Ifc.Geom
             {
                 switch (operation)
                 {
-                    case OperationName.POLYGON_SHAPE:
-                        PolygonShape(operandStack);
+                    case OperationName.POLYLINE2D:
+                        Polyline2D(operandStack);
+                        break;
+                    case OperationName.SHAPE:
+                        Shape(operandStack);
                         break;
                     case OperationName.EXTRUDE:
                         Extrude(operandStack);
@@ -73,20 +77,19 @@ namespace IfcCreator.Ifc.Geom
             }
         }
 
-        private static void PolygonShape(Stack operandStack)
+        private static void Polyline2D(Stack operandStack)
         {
             string operand = (string) operandStack.Pop();
             //remove all spaces
             operand.Replace(" ", "");
-            if ((operand.Length < 19) || !operand.StartsWith("[[[") || !operand.EndsWith("]]]"))
-            {   //operand should represent a three dimensional array
-                throw new ArgumentException(string.Format("Invalid operand for POLYGON_SHAPE: {0}", operand), "POLYGON_SHAPE");
+            if ((operand.Length < 12) || !operand.StartsWith("[[") || !operand.EndsWith("]]"))
+            {   //operand should represent a two dimensional array with at least two points
+                throw new ArgumentException(string.Format("Invalid operand for POLYLINE2D: {0}", operand), "POLYLINE2D");
             }
         
             // Parse operand
             int openParenthesis = 2;
-            List<List<double[]>> paths = new List<List<double[]>>();
-            List<double[]> currentPath = new List<double[]>();
+            List<double[]> curve = new List<double[]>();
             List<double> currentVector = new List<double>();
             StringBuilder stringBuffer = new StringBuilder(); 
             for (int i=2; i < operand.Length; ++i)
@@ -98,21 +101,16 @@ namespace IfcCreator.Ifc.Geom
                         break;
                     case ']':
                         openParenthesis--;
-                        if (openParenthesis == 2)
+                        if (openParenthesis == 1)
                         {   // closing current vector
                             currentVector.Add(Double.Parse(stringBuffer.ToString()));
                             stringBuffer.Clear();
-                            currentPath.Add(currentVector.ToArray());
+                            curve.Add(currentVector.ToArray());
                             currentVector = new List<double>();
-                        }
-                        if (openParenthesis == 1)
-                        {   // closing current path
-                            paths.Add(currentPath);
-                            currentPath = new List<double[]>();
                         }
                         break;
                     case ',':
-                        if (openParenthesis == 3)
+                        if (openParenthesis == 2)
                         {   // starting new coordinate in vector
                             currentVector.Add(Double.Parse(stringBuffer.ToString()));
                             stringBuffer.Clear();
@@ -124,38 +122,39 @@ namespace IfcCreator.Ifc.Geom
                 }
             }
 
-            // Construct IFC closed profile
-            var curveList = new List<IfcPolyline>();
-            for (int i=0; i<paths.Count; ++i)
+            // Construct IFC PolyLine
+            operandStack.Push(IfcGeom.CreatePolyLine(curve));
+
+        }
+
+        private static void Shape(Stack operandStack)
+        {
+            var curveList = new List<IfcCurve>();
+            var poppedValue = operandStack.Pop();
+
+            while(poppedValue.GetType() != typeof(char) )
             {
-                if (!paths[i][0].SequenceEqual(paths[i][paths[i].Count-1]))
-                {   // close the curve when needed
-                    paths[i].Add(paths[i][0]);
-                }
-                if (paths[i].Count < 4)
-                {
-                    throw new ArgumentException("At least 4 points are needed to define a shape");
-                }
-                curveList.Add(IfcGeom.CreatePolyLine(paths[i]));
+                curveList.Add((IfcCurve) poppedValue);
+                poppedValue = operandStack.Pop();
             }
 
-            IfcCurve outerCurve = curveList[0];
+            // Construct IFC closed profile
+            IfcCurve outerCurve = curveList[curveList.Count-1];
             //remove the outer curve from the list to have a list of the innercurves
-            curveList.RemoveRange(0,1);
+            curveList.RemoveRange(curveList.Count-1,1);
             if (curveList.Count == 0)
             {   // only outer curve without voids
                 operandStack.Push(new IfcArbitraryClosedProfileDef(IfcProfileTypeEnum.AREA,
-                                                                    null,
-                                                                    outerCurve));
+                                                                   null,
+                                                                   outerCurve));
             }
             else
             {   // outer curve with voids
                 operandStack.Push(new IfcArbitraryProfileDefWithVoids(IfcProfileTypeEnum.AREA,
-                                                                        null,
-                                                                        outerCurve,
-                                                                        curveList.ToArray()));
+                                                                      null,
+                                                                      outerCurve,
+                                                                      curveList.ToArray()));
             }
-
         }
 
         private static void Extrude(Stack operandStack)

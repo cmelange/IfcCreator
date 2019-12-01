@@ -28,8 +28,8 @@ namespace IfcCreator.Ifc.Geom
                     case ')':
                         // parenthesis are closed after operand
                         if (stringBuffer.Length > 0)
-                        {   //needed only in case of literal operand. The result of nested operations
-                            //is pushed on the stack by the ExecuteOperation function
+                        {
+                            //stringBuffer could be empty if argument was a function closed with a ')'
                             operandStack.Push(stringBuffer.ToString());
                         }
                         stringBuffer.Clear();
@@ -43,6 +43,27 @@ namespace IfcCreator.Ifc.Geom
                         break;
                     case '\t':
                         //remove tabs
+                        break;
+                    case '{':
+                        //braces are opened at the start of an array
+                        operandStack.Push('{'); //braces are added to the operand stack to mark the end of the array
+                        stringBuffer.Clear();
+                        break;
+                    case '}':
+                        //braces are closed at the end of an array
+                        if (stringBuffer.Length > 0)
+                        {   //stringBuffer could be empty if argument was a function closed with a ')'
+                            operandStack.Push(stringBuffer.ToString());
+                        }
+                        stringBuffer.Clear();
+                        break;
+                    case ';':
+                        //marks separation between arguments
+                        if (stringBuffer.Length > 0)
+                        {   //stringBuffer could be empty if argument was a function closed with a ')'
+                            operandStack.Push(stringBuffer.ToString());
+                        }
+                        stringBuffer.Clear();
                         break;
                     case '.':
                         // nor an operation, nor an operand starts with a dot
