@@ -77,6 +77,38 @@ namespace IfcCreator.Ifc.Geom
         }
 
         [Fact]
+        public void CompositeCurve2DTest()
+        {
+            var operandStack = new Stack();
+            operandStack.Push('{');
+            operandStack.Push(IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {-0.5, -0.5},
+                                                                            new double[] {0, 0}}));
+            operandStack.Push(IfcGeom.CreatePolyLine(new List<double[]>() { new double[] {0, 0},
+                                                                            new double[] {0.5, 0.5}}));
+            var operation = OperationName.COMPOSITE_CURVE2D;
+            ConstructionOperations.ExecuteOperation(operation, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcCompositeCurve>(response);
+            IfcCompositeCurve curve = (IfcCompositeCurve) response;
+            Assert.Equal(2, curve.Segments.Count);
+            IfcCompositeCurveSegment curve0 = curve.Segments[0];
+            Assert.Equal(IfcTransitionCode.CONTINUOUS, curve0.Transition);
+            Assert.True(curve0.SameSense.Value);
+            Assert.Equal(-0.5, ((IfcPolyline) curve0.ParentCurve).Points[0].Coordinates[0].Value);
+            Assert.Equal(-0.5, ((IfcPolyline) curve0.ParentCurve).Points[0].Coordinates[1].Value);
+            Assert.Equal(0, ((IfcPolyline) curve0.ParentCurve).Points[1].Coordinates[0].Value);
+            Assert.Equal(0, ((IfcPolyline) curve0.ParentCurve).Points[1].Coordinates[1].Value);
+            IfcCompositeCurveSegment curve1 = curve.Segments[1];
+            Assert.Equal(IfcTransitionCode.CONTINUOUS, curve1.Transition);
+            Assert.True(curve1.SameSense.Value);
+            Assert.Equal(0, ((IfcPolyline) curve1.ParentCurve).Points[0].Coordinates[0].Value);
+            Assert.Equal(0, ((IfcPolyline) curve1.ParentCurve).Points[0].Coordinates[1].Value);
+            Assert.Equal(0.5, ((IfcPolyline) curve1.ParentCurve).Points[1].Coordinates[0].Value);
+            Assert.Equal(0.5, ((IfcPolyline) curve1.ParentCurve).Points[1].Coordinates[1].Value);
+        }
+
+        [Fact]
         public void Shape()
         {
             var operandStack = new Stack();

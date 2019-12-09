@@ -15,6 +15,7 @@ namespace IfcCreator.Ifc.Geom
     {
         POLYLINE2D,
         CIRCLELINE2D,
+        COMPOSITE_CURVE2D,
         SHAPE,
         EXTRUDE,
         REVOLVE,
@@ -41,6 +42,9 @@ namespace IfcCreator.Ifc.Geom
                         break;
                     case OperationName.CIRCLELINE2D:
                         Circleline2D(operandStack);
+                        break;
+                    case OperationName.COMPOSITE_CURVE2D:
+                        CompositeCurve2D(operandStack);
                         break;
                     case OperationName.SHAPE:
                         Shape(operandStack);
@@ -146,6 +150,22 @@ namespace IfcCreator.Ifc.Geom
                                                   new IfcTrimmingSelect[] {new IfcParameterValue(endParam)},
                                                   new IfcBoolean(true),
                                                   IfcTrimmingPreference.PARAMETER));
+        }
+
+        private static void CompositeCurve2D(Stack operandStack)
+        {
+            var curveList = new List<IfcCompositeCurveSegment>();
+            var poppedValue = operandStack.Pop();
+
+            while(poppedValue.GetType() != typeof(char) )
+            {
+                curveList.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS,
+                                                           new IfcBoolean(true),
+                                                           (IfcCurve) poppedValue));
+                poppedValue = operandStack.Pop();
+            }
+            curveList.Reverse();
+            operandStack.Push(new IfcCompositeCurve(curveList.ToArray(), new IfcLogical(false)));
         }
 
         private static void Shape(Stack operandStack)
