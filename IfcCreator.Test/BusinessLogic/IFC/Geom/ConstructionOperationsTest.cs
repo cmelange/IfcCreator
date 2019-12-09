@@ -46,6 +46,37 @@ namespace IfcCreator.Ifc.Geom
         }
 
         [Fact]
+        public void Circleline2DTest()
+        {
+            var operandStack = new Stack();
+            operandStack.Push("[0.5, -0.5]");   // center
+            operandStack.Push("1.5");           // radius
+            operandStack.Push("180");           // start parameter
+            operandStack.Push("90");            // end parameter
+            var operation = OperationName.CIRCLELINE2D;
+            ConstructionOperations.ExecuteOperation(operation, operandStack);
+            Assert.Single(operandStack);
+            var response = operandStack.Pop();
+            Assert.IsType<IfcTrimmedCurve>(response);
+            IfcTrimmedCurve curve = (IfcTrimmedCurve) response;
+            Assert.IsType<IfcCircle>(curve.BasisCurve);
+            IfcCircle circle = (IfcCircle) curve.BasisCurve;
+            Assert.Equal(0.5, ((IfcAxis2Placement2D) circle.Position).Location.Coordinates[0].Value);
+            Assert.Equal(-0.5, ((IfcAxis2Placement2D) circle.Position).Location.Coordinates[1].Value);
+            Assert.Equal(1, ((IfcAxis2Placement2D) circle.Position).RefDirection.DirectionRatios[0].Value);
+            Assert.Equal(0, ((IfcAxis2Placement2D) circle.Position).RefDirection.DirectionRatios[1].Value);
+            Assert.Equal(1.5, circle.Radius.Value.Value);
+            var trim1Enumerator = curve.Trim1.GetEnumerator();
+            trim1Enumerator.MoveNext();
+            Assert.Equal(180, ((IfcParameterValue) trim1Enumerator.Current).Value);
+            var trim2Enumerator = curve.Trim2.GetEnumerator();
+            trim2Enumerator.MoveNext();
+            Assert.Equal(90, ((IfcParameterValue) trim2Enumerator.Current).Value);
+            Assert.True(curve.SenseAgreement.Value);
+            Assert.Equal(IfcTrimmingPreference.PARAMETER, curve.MasterRepresentation);
+        }
+
+        [Fact]
         public void Shape()
         {
             var operandStack = new Stack();

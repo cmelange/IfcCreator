@@ -7,12 +7,14 @@ using System.Text;
 using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcGeometryResource;
 using BuildingSmart.IFC.IfcProfileResource;
+using BuildingSmart.IFC.IfcMeasureResource;
 
 namespace IfcCreator.Ifc.Geom
 {
     public enum OperationName
     {
         POLYLINE2D,
+        CIRCLELINE2D,
         SHAPE,
         EXTRUDE,
         REVOLVE,
@@ -36,6 +38,9 @@ namespace IfcCreator.Ifc.Geom
                 {
                     case OperationName.POLYLINE2D:
                         Polyline2D(operandStack);
+                        break;
+                    case OperationName.CIRCLELINE2D:
+                        Circleline2D(operandStack);
                         break;
                     case OperationName.SHAPE:
                         Shape(operandStack);
@@ -125,6 +130,22 @@ namespace IfcCreator.Ifc.Geom
             // Construct IFC PolyLine
             operandStack.Push(IfcGeom.CreatePolyLine(curve));
 
+        }
+
+        private static void Circleline2D(Stack operandStack)
+        {
+            double endParam = Double.Parse((string) operandStack.Pop());
+            double startParam = Double.Parse((string) operandStack.Pop());
+            double radius = Double.Parse((string) operandStack.Pop());
+            double[] center = ParseArray((string) operandStack.Pop());
+            operandStack.Push(new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement2D(new IfcCartesianPoint(center[0], center[1]),
+                                                                                        new IfcDirection(new IfcReal[] {new IfcReal(1),
+                                                                                                                        new IfcReal(0)})), 
+                                                                new IfcPositiveLengthMeasure(radius)),
+                                                  new IfcTrimmingSelect[] {new IfcParameterValue(startParam)},
+                                                  new IfcTrimmingSelect[] {new IfcParameterValue(endParam)},
+                                                  new IfcBoolean(true),
+                                                  IfcTrimmingPreference.PARAMETER));
         }
 
         private static void Shape(Stack operandStack)
