@@ -40,9 +40,25 @@ product_ifc_request = {
         "name": "test product",
         "description": "product for integration testing",
         "representations": [
-            { "representationItems": [
+            {   
+                "materials": [
                     {
-                        "constructionString": "POLYGON_SHAPE([[[0,0],[0,1],[1,1],[1,0]]]).EXTRUDE(1)"
+                        "id": "123-456-789",
+                        "name": "my material",
+                        "color": {
+                            "red": 1.0,
+                            "green": 0.5,
+                            "blue": 0.5,
+                            "alpha": 1.0
+                        },
+                        "metal": True,
+                        "roughness": 0.5
+                    }
+                ],
+                "representationItems": [
+                    {
+                        "constructionString": "SHAPE({POLYLINE2D([[0,0],[0,1],[1,1],[1,0]])}).EXTRUDE(1)",
+                        "material": "123-456-789"
                     }
                 ]
             }

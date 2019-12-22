@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace IfcCreator.Interface.DTO
@@ -5,6 +6,7 @@ namespace IfcCreator.Interface.DTO
     public class Material
     {
         [Required]
+        public string id {get; set; }
         public string name {get; set; }
         public ColorRGBa color {get; set; }
         public bool metal {get; set; }
@@ -12,6 +14,7 @@ namespace IfcCreator.Interface.DTO
 
         private Material()
         {
+            this.id = Guid.NewGuid().ToString();
             this.name = "default material";
             this.color = new ColorRGBa(1.0, 1.0, 1.0, 1.0);
             this.metal = false;

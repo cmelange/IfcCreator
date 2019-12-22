@@ -99,15 +99,15 @@ namespace IfcCreator
             {
                 try
                 {
-                    presentationStyleDictionary.Add(material.name,
+                    presentationStyleDictionary.Add(material.id,
                                                     IfcInit.CreateSurfaceStyle(material.name,
-                                                                            material.color,
-                                                                            material.metal,
-                                                                            material.roughness));
+                                                                               material.color,
+                                                                               material.metal,
+                                                                               material.roughness));
                 }
                 catch(ArgumentException ex)
                 {
-                    throw new ArgumentException(string.Format("Material with name {0} already exists", material.name),
+                    throw new ArgumentException(string.Format("Material with id {0} already exists", material.id),
                                                 "materials", ex);
                 }
             }

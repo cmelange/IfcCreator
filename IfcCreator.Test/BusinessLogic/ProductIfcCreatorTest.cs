@@ -7,6 +7,7 @@ using BuildingSmart.IFC.IfcUtilityResource;
 using BuildingSmart.IFC.IfcGeometricModelResource;
 using BuildingSmart.IFC.IfcKernel;
 using BuildingSmart.IFC.IfcRepresentationResource;
+using BuildingSmart.IFC.IfcPresentationAppearanceResource;
 using BuildingSmart.Serialization;
 using BuildingSmart.Serialization.Step;
 
@@ -61,7 +62,7 @@ namespace IfcCreator
 
             string productName = "test product";
             string productDescription = "product for test purposes";
-            string constructionString = "POLYGON_SHAPE([[[0,0],[0,1],[1,1],[1,0]]]).EXTRUDE(1)";
+            string constructionString = "SHAPE({POLYLINE2D([[0,0],[0,1],[1,1],[1,0]])}).EXTRUDE(1)";
             var material0 = new Material.Builder().withName("material0")
                                                   .withColor(new ColorRGBa(1,0,0,1))
                                                   .withRoughness(0)
@@ -75,7 +76,7 @@ namespace IfcCreator
             RepresentationItem representationItem0 =
                 new RepresentationItem.Builder()
                                       .withConstructionString(constructionString)
-                                      .withMaterial(material0.name)
+                                      .withMaterial(material0.id)
                                       .build();
             var rotationQ = new Quaternion();
             rotationQ.SetFromEuler(new double[] {90, 90, 90} );
@@ -86,7 +87,7 @@ namespace IfcCreator
                                                                             .withTranslation(new double[] {2,0,0})
                                                                             .withRotation(rotationQ.ToArray())
                                                                             .build())
-                                      .withMaterial(material1.name)
+                                      .withMaterial(material1.id)
                                       .build();
             Representation representation = 
                 new Representation.Builder().AddRepresentationItem(representationItem0)
@@ -156,6 +157,10 @@ namespace IfcCreator
             Assert.Equal(2, parsedShapeRepresentation.Items.Count);
             Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,0));
             Assert.IsType<IfcExtrudedAreaSolid>(GetItem(parsedShapeRepresentation.Items,1));
+            var parsedItem0 = (IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,0);
+            Assert.Equal(1, parsedItem0.StyledByItem.Count);
+            var StyledItem0 = GetItem(parsedItem0.StyledByItem, 0);
+            Assert.Equal("material0", ((IfcSurfaceStyle) GetItem(StyledItem0.Styles, 0)).Name);
             var parsedItem1 = (IfcExtrudedAreaSolid) GetItem(parsedShapeRepresentation.Items,1);
             Assert.Equal(2, parsedItem1.Position.Location.Coordinates[0].Value);
             Assert.Equal(0, parsedItem1.Position.Location.Coordinates[1].Value);
@@ -166,6 +171,9 @@ namespace IfcCreator
             Assert.Equal(0, parsedItem1.Position.RefDirection.DirectionRatios[0].Value, 5);
             Assert.Equal(0, parsedItem1.Position.RefDirection.DirectionRatios[1].Value, 5);
             Assert.Equal(1, parsedItem1.Position.RefDirection.DirectionRatios[2].Value, 5);
+            Assert.Equal(1, parsedItem0.StyledByItem.Count);
+            var StyledItem1 = GetItem(parsedItem1.StyledByItem, 0);
+            Assert.Equal("material1", ((IfcSurfaceStyle) GetItem(StyledItem1.Styles, 0)).Name);
         }
 
         private T GetItem<T>(IEnumerable<T> enumerable, int index)
